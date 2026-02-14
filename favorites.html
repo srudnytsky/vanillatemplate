@@ -1,623 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Your Energy · Favorites</title>
-    <!-- Google Fonts & Icons (exactly as described, using DM Sans + Font Awesome) -->
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <style>
-        /* RESET + GLOBAL — pixel-perfect implementation based on both PNG descriptions */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'DM Sans', sans-serif;
-            background: #f8f8f8;
-            color: #121417;
-            line-height: 1.3;
-        }
-
-        .container {
-            max-width: 1440px;
-            margin: 0 auto;
-            background: white;
-            box-shadow: 0 0 40px rgba(0,0,0,0.02);
-        }
-
-        /* ------ HEADER (matches YOURL ENERGY style) ------ */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 24px 64px;
-            background: white;
-            border-bottom: 1px solid #e8e8e8;
-        }
-
-        .logo {
-            font-weight: 700;
-            font-size: 24px;
-            letter-spacing: 1px;
-            color: #121417;
-        }
-
-        .nav-tabs {
-            display: flex;
-            gap: 48px;
-        }
-
-        .nav-tab {
-            font-size: 18px;
-            font-weight: 500;
-            color: #93979c;
-            cursor: default;
-            position: relative;
-        }
-
-        .nav-tab.active {
-            color: #121417;
-            font-weight: 700;
-        }
-
-        .nav-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: #121417;
-        }
-
-        .social-icons {
-            display: flex;
-            gap: 16px;
-        }
-
-        .social-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #f0f1f3;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #121417;
-            font-size: 16px;
-        }
-
-        /* ------ MAIN layout (two columns) ------ */
-        .main-content {
-            padding: 40px 64px 60px;
-            display: grid;
-            grid-template-columns: 1fr 1.6fr; /* left ~1, right ~1.6 -> matches quote + workout grid */
-            gap: 40px;
-            align-items: start;
-        }
-
-        .page-title {
-            grid-column: 1 / -1;
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            line-height: 1.1;
-        }
-
-        /* left column cards */
-        .left-column {
-            display: flex;
-            flex-direction: column;
-            gap: 28px;
-        }
-
-        /* quote card — exact from first image */
-        .quote-card {
-            background: white;
-            border: 1px solid #e0e2e4;
-            border-radius: 24px;
-            padding: 32px 24px 24px 24px;
-            position: relative;
-        }
-
-        .quote-icon {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            font-size: 32px;
-            color: #d9d9d9;
-        }
-
-        .quote-title {
-            font-weight: 700;
-            font-size: 22px;
-            margin-bottom: 24px;
-        }
-
-        .quote-text {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #2b2f34;
-            margin-bottom: 20px;
-            max-width: 90%;
-        }
-
-        .quote-author {
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        /* daily norm card – exactly as shown */
-        .norm-card {
-            background: white;
-            border: 1px solid #e0e2e4;
-            border-radius: 24px;
-            padding: 24px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            position: relative;
-        }
-
-        .norm-icon {
-            font-size: 40px;
-            color: #d9d9d9;
-            min-width: 50px;
-        }
-
-        .norm-content {
-            flex: 1;
-        }
-
-        .norm-title {
-            font-weight: 700;
-            font-size: 32px;
-            letter-spacing: -0.5px;
-        }
-
-        .norm-subtitle {
-            color: #6b7178;
-            font-size: 16px;
-        }
-
-        .norm-image {
-            width: 100px;
-            height: 100px;
-            border-radius: 16px;
-            background-color: #cbd5e1;
-            background-size: cover;
-            background-position: center;
-        }
-
-        /* right column – exercise grid / empty state */
-        .right-column {
-            background: transparent;
-        }
-
-        .favorites-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        /* ---- EXERCISE CARDS (exact copy from first screenshot) ---- */
-        .exercise-card {
-            background: white;
-            border: 1px solid #e0e2e4;
-            border-radius: 24px;
-            padding: 20px 24px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            transition: 0.1s;
-        }
-
-        .exercise-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            min-width: 200px;
-        }
-
-        .exercise-name {
-            font-weight: 700;
-            font-size: 18px;
-            color: #121417;
-        }
-
-        .exercise-start {
-            font-size: 14px;
-            color: #93979c;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .exercise-start i {
-            font-size: 12px;
-            color: #121417;
-        }
-
-        .exercise-meta {
-            display: flex;
-            flex-direction: column;
-            margin-left: 10px;
-        }
-
-        .exercise-badge {
-            background: #f0f1f3;
-            border-radius: 30px;
-            padding: 4px 16px;
-            font-weight: 500;
-            font-size: 16px;
-            display: inline-block;
-            margin-bottom: 6px;
-        }
-
-        .exercise-stats {
-            display: flex;
-            gap: 32px;
-            font-size: 14px;
-            color: #6b7178;
-        }
-
-        .exercise-stats span {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .exercise-stats strong {
-            font-weight: 700;
-            color: #121417;
-            font-size: 15px;
-        }
-
-        .exercise-body-target {
-            display: flex;
-            gap: 30px;
-            font-size: 14px;
-            color: #6b7178;
-        }
-
-        .exercise-body-target span {
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* start button inside card (exact "Start" from design) */
-        .start-btn {
-            background: #121417;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 12px 28px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: default;
-            min-width: 110px;
-            text-align: center;
-            transition: 0.1s;
-            margin-left: 8px;
-        }
-
-        /* empty state (second image) */
-        .empty-favorites {
-            background: white;
-            border: 1px solid #e0e2e4;
-            border-radius: 24px;
-            padding: 48px 32px;
-            text-align: left;
-        }
-
-        .empty-favorites p {
-            font-size: 18px;
-            color: #2b2f34;
-            line-height: 1.6;
-            max-width: 80%;
-        }
-
-        .empty-favorites .hint-icon {
-            font-size: 48px;
-            color: #d4d7db;
-            margin-bottom: 24px;
-        }
-
-        /* footer (from global style, consistent with mockups) */
-        .footer {
-            background: #121417;
-            color: white;
-            padding: 48px 64px 32px;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr 1.3fr;
-            gap: 60px;
-            margin-bottom: 48px;
-        }
-
-        .footer-logo {
-            font-weight: 700;
-            font-size: 22px;
-            margin-bottom: 16px;
-        }
-
-        .footer-title {
-            font-weight: 500;
-            font-size: 18px;
-            margin: 16px 0 8px;
-        }
-
-        .footer-text {
-            color: #acb2b9;
-            font-size: 15px;
-            line-height: 1.5;
-            max-width: 280px;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 16px;
-            margin-top: 20px;
-        }
-
-        .social-link {
-            width: 40px;
-            height: 40px;
-            background: #262a2f;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .footer-links {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .footer-link {
-            color: #acb2b9;
-            text-decoration: none;
-            font-size: 15px;
-        }
-
-        .footer-email {
-            background: transparent;
-            border: 1px solid #3f4348;
-            border-radius: 40px;
-            padding: 12px 18px;
-            color: white;
-            font-size: 15px;
-            width: 100%;
-        }
-
-        .footer-email::placeholder {
-            color: #6b7178;
-        }
-
-        .footer-btn {
-            background: white;
-            color: #121417;
-            border: none;
-            border-radius: 40px;
-            padding: 12px;
-            font-weight: 700;
-            font-size: 16px;
-            width: 100%;
-            cursor: default;
-        }
-
-        .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            border-top: 1px solid #262a2f;
-            padding-top: 28px;
-            color: #acb2b9;
-            font-size: 14px;
-        }
-
-        .footer-legal {
-            display: flex;
-            gap: 12px;
-        }
-
-        .footer-legal a {
-            color: #acb2b9;
-            text-decoration: none;
-        }
-
-        /* micro adjustments */
-        .exercise-start .arrow {
-            font-weight: 500;
-        }
-
-        /* mobile edge: keep stable */
-        @media (max-width: 1000px) {
-            .main-content { grid-template-columns: 1fr; }
-            .header { padding: 24px 32px; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Energy · Favorites</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" crossorigin href="/vanillatemplate/assets/favorites-BDEEhXzx.css">
+  <link rel="stylesheet" crossorigin href="/vanillatemplate/assets/layout-BBKYc0BY.css">
 </head>
 <body>
+   <!-- Header -->
+  <header class="header">
     <div class="container">
-        <!-- HEADER (exact replica from both PNGs) -->
-        <header class="header">
-            <div class="logo">YOUR ENERGY</div>
-            <div class="nav-tabs">
-                <div class="nav-tab" data-tab="home">Home</div>
-                <div class="nav-tab active" data-tab="favorites">Favorites</div>
-            </div>
-            <div class="social-icons">
-                <div class="social-icon"><i class="fab fa-facebook-f"></i></div>
-                <div class="social-icon"><i class="fab fa-instagram"></i></div>
-                <div class="social-icon"><i class="fab fa-youtube"></i></div>
-            </div>
-        </header>
+      <div class="logo">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIQAAAAYCAYAAAA74FWfAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAStSURBVHgB7VldUiIxEA46Pi83WCz1WT2BwwnEE4AnAE7AeALxBOIJ1BM4nmDxWS25gey7P/t9Y0djSIYZhIKtylelmcl0upNO/yUoFRAQEBAQEBAQEPBDVLa3t2/QxvJef3h4SG2ira2tQaVSafL5/f299fj4eIFxPbwmXsaVyuD+/v7YxePl5WVzBNhjwPNdHlPMo14Doih6UvkYg28dsoY+goJ8MkAudZLgsSddPp08QW6t5Fx9MnwYQld1qGqsOyhnfX39RmRPAPszen195ZiRMccx+Ox7dH6JpsFn0O6vgZCbNhZm5/YATsAwhlERYxDa1s7OzrlaPKqQdQNZe2oBoE6ggqpaDvZgZDda/jRjIPiNNLJv2iGr4DOxFzCYlhJjwDrpwMOIVoMNPkNfj8zw3IEF9/UgkxEtD0zIIJGuMRh1HfPKeNEowO/O5PcD3KpJI6QRnKoPo2Bbn8YEdBeMXqoguA7ogA7QVcXhmmuejA7mdWf2UXfiiDSKDvlhoxNtDHRONCcWn0M0DZnzJfS+j/26ED4x9iK2ol1P88LeZrwi/kOU6ENYU4T1YFwDhimxoFgGnUkYig2GJ4gYA3uBoGHEuZTXuXgX5D9BVmp1p5DVzvMYG6AduVLAFHSgzOui4zxzzaO/s3lDHpumb4xOC1b3QKcJ8KwKXQfGQUOpSgbYFP40hpqMSzSvNf7j5lvhRec204L6joWMHXOl0p39/yn0Wk7VCsFVDwi62BfuZVfoOP/M+yUDJEwnSiKYLgP04Eg/0EJBnKqPiECP4KCafE5yJrBUYJGlIhA9RxTiwtgs4IS+Cxn0rD0qE3pKVIE5lZExT2Bzr+w+pmzMPUs/+GvD4Xf1N0YakzYyX1hggviP+gjzDekemha0RMQIh98KI0kVmUHYOdgHjKFC2q5v4lkDsw8KS5FOzzgOrz0Ur1d5JxpBAzIaRWWQL9bWtOhiyNTPufIwtg/aXat7DEM4Mt4ZMXii/NxbFpK2o38zCLPA1H0wkiO1ApDNb3k+X8FoO2pBgFGwoDuU3Eyj3FfzxefmO9B1eb0JMYbY7JOi8xPMAEaB+a2QNBHZHSwwjRoiXZVUIQtMzT4sjpZOi48ZoovMlcWxqx4SOEM5QzwchZ5ND8tSB/ioHFxDj50SMq7MekzSoI4wLAhzT2lycrqV56avyKZhY2+bIuPCpa8Jg5DFqxVECk85Njtg8ddYGE8zLITZTvVcFryzGLl4mE4d7RyP5qY8l5RxZp9KJA1QVmxfBdgwT3qgPVBftV9prKklYGNjY6IQnOXyh6FUh0Z9zFok6GEir6rmdJz2AcZgpgmXvmpqAYhUeZih7RRF1q+3t7e/JgGU1tMehPZZ2pH+DvpLeIB9qdJ2yZg3MLffvKDxfc+7a7BShxcM+bPKKAreRjp0+FlLzHr0L20Q9EoslhNhncHLjr4vfDK3YfEsUqmEBAvIrsElx/mutYdynb4QQHZL+YvTjCTnm506fGiorxqgtAwfpLg9oP7ydCgF40yHgZlShpzFT/JoaAwwnpbZx3f25wyb+DFnFcGNUQuMYj6wLuG9gX2CMGH+uKUCAgICAgICAgICloF/uJzH+KOtfxwAAAAASUVORK5CYII=" alt="YOUR ENERGY" />
+      </div>
+      
+      <!-- Бургер-меню ТОЛЬКО для мобильных -->
+      <button class="menu-toggle" aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
 
-        <!-- MAIN (dynamic between filled / empty favorites) -->
-        <main class="main-content">
-            <h1 class="page-title">Favorites</h1>
+  <div class="nav-pills">
+  <a href="index.html" class="nav-pill">Home</a>
+  <a href="favorites.html" class="nav-pill active">Favorites</a>
+</div>
 
-            <!-- LEFT COLUMN (identical on both screens) -->
-            <div class="left-column">
-                <!-- Quote of the day (exact copy from both images) -->
-                <div class="quote-card">
-                    <div class="quote-icon">
-                        <i class="fas fa-running"></i>
-                    </div>
-                    <h3 class="quote-title">Quote of the day</h3>
-                    <p class="quote-text">A lot of times I find that people who are blessed with the most talent don't ever develop that attitude, and the ones who aren't blessed in that way are the most competitive and have the biggest heart.</p>
-                    <p class="quote-author">Tom Brady</p>
-                </div>
-
-                <!-- Daily norm card with image (exact from both PNGs) -->
-                <div class="norm-card">
-                    <div class="norm-icon">
-                        <i class="fas fa-fire"></i>
-                    </div>
-                    <div class="norm-content">
-                        <h3 class="norm-title">110 min</h3>
-                        <p class="norm-subtitle">Daily norm of sports</p>
-                    </div>
-                    <div class="norm-image" style="
-                        background-image: url('https://your-energy.b.goit.study/images/young-women-doing-fitness-outdoors-together.jpg');
-                        background-size: cover;
-                        background-position: center;
-                    "></div>
-                </div>
-            </div>
-
-            <!-- RIGHT COLUMN: dynamic content via JS (but we also show exact static fallback) -->
-            <div class="right-column">
-                <div class="favorites-container" id="favorites-container">
-                    <!-- will be replaced by javascript if needed, but initial static should be based on filled or empty? 
-                         We need to show exactly first PNG (filled) by default? But the second PNG shows empty.
-                         Let's implement dynamic via JS: check a flag, but for exact preview we show the version with 4 workouts (filled) 
-                         as a base, because first screenshot is more detailed. However we need both possibilities. 
-                         The task: "по двум макетам надо собрать точ в точ" — likely we need to show the filled version, but also include empty possibility.
-                         We'll use JS to switch? but it's a static html. We'll provide both using JS flag. 
-                         But for clarity, let's show the version with 4 workouts, and below we provide a small toggle? 
-                         No, better to have a parameter. We'll initially render FILLED (first image) because the second empty is a fallback. 
-                         To be accurate, i'll fill with the exact workouts from first screenshot. 
-                    -->
-                </div>
-            </div>
-        </main>
-
-        <!-- FOOTER (identical in both PNGs) -->
-        <footer class="footer">
-            <div class="footer-content">
-                <div>
-                    <div class="footer-logo">YOUR ENERGY</div>
-                    <p class="footer-title">Transforming your body shape with us</p>
-                    <p class="footer-text">Transform your physique and embrace a healthier lifestyle with our comprehensive fitness and nutrition support.</p>
-                    <div class="social-links">
-                        <div class="social-link"><i class="fab fa-facebook-f"></i></div>
-                        <div class="social-link"><i class="fab fa-instagram"></i></div>
-                        <div class="social-link"><i class="fab fa-youtube"></i></div>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="footer-title">Quick Links</h3>
-                    <div class="footer-links">
-                        <a href="#" class="footer-link">Home</a>
-                        <a href="#" class="footer-link">About Us</a>
-                        <a href="#" class="footer-link">Workout Plans</a>
-                        <a href="#" class="footer-link">Nutrition</a>
-                        <a href="#" class="footer-link">Contact</a>
-                    </div>
-                </div>
-                <div>
-                    <h3 class="footer-title">Newsletter</h3>
-                    <p class="footer-text">Subscribe and learn about new exercises!</p>
-                    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
-                        <input type="email" placeholder="Email" class="footer-email" />
-                        <button class="footer-btn">Send</button>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <div class="footer-copyright">©2023 Your Energy. All rights reserved.</div>
-                <div class="footer-legal">
-                    <a href="#">Privacy Policy</a>
-                    <span>/</span>
-                    <a href="#">Terms of Service</a>
-                </div>
-            </div>
-        </footer>
+      <div class="social-header">
+        <a href="#" aria-label="Facebook">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </a>
+        <a href="#" aria-label="Instagram">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+          </svg>
+        </a>
+        <a href="#" aria-label="YouTube">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+          </svg>
+        </a>
+      </div>
     </div>
 
-    <script>
-        (function() {
-            // Exact data from first PNG (Favorites_desktop.png)
-            const filledWorkouts = [
-                { name: 'Workout 1', startLink: 'Start →', detail: '3/4 sit-up', calories: '312 / 3 min', body: 'Waist', target: 'Abs' },
-                { name: 'Workout 2', startLink: 'Start →', detail: '45° side ben', calories: '323 / 3 min', body: 'Waist', target: 'Abs' },
-                { name: 'Workout 3', startLink: 'Start →', detail: 'Barbell reverse preacher curl', calories: '153 / 3 min', body: 'Waist', target: 'Abs' },
-                { name: 'Workout 4', startLink: 'Start →', detail: 'Barbell side split squat v. 2', calories: '60 / 3 min', body: 'Waist', target: 'Abs' }
-            ];
+    <!-- Модальное меню ТОЛЬКО для мобильных -->
+    <div class="mobile-menu">
+      <button class="mobile-menu-close">×</button>
+      <div class="mobile-menu-links">
+        <a href="#" class="mobile-menu-link">Home</a>
+        <a href="#" class="mobile-menu-link">Favorites</a>
+      </div>
+    </div>
+  </header>
+  <!-- Хедер из base.css -->
+  <main class="favorites-page">
+    <div class="container">
+      <h1 class="page-title">Favorites</h1>
 
-            // Empty state matches second PNG (Favorites_not found_desktop.png)
-            const container = document.getElementById('favorites-container');
+      <!-- Основной макет: левая колонка (цитата + норма) + правая (упражнения) -->
+      <div class="favorites-layout">
+        <!-- ЛЕВАЯ КОЛОНКА: вертикальный стек -->
+        <div class="left-column">
+          <!-- Цитата дня — черная карточка -->
+          <div class="quote-card card">
+            <div class="quote-icon">
+              <i class="fas fa-running"></i>
+            </div>
+            <h3 class="quote-title">Quote of the day</h3>
+            <p class="quote-text">
+              A lot of times I find that people who are blessed with the most talent don't ever develop that attitude, and the ones who aren't blessed in that way are the most competitive and have the biggest heart.
+            </p>
+            <p class="quote-author">— Tom Brady</p>
+          </div>
 
-            // Decide which version to show: 
-            // Use a simple condition: if URL contains '?empty' then show empty, otherwise show filled.
-            const showEmpty = window.location.search.includes('empty') || window.location.hash === '#empty';
+          <!-- Норма спорта — белая карточка, ниже цитаты -->
+          <div class="norm-card card">
+            <div class="norm-icon">
+              <i class="fas fa-fire"></i>
+            </div>
+            <div class="norm-content">
+              <h3>110 min</h3>
+              <p>Daily norm of sports</p>
+            </div>
+            <div class="norm-image"></div>
+          </div>
+        </div>
 
-            if (showEmpty) {
-                // Render empty state (exact copy from second image)
-                container.innerHTML = `
-                    <div class="empty-favorites">
-                        <div class="hint-icon"><i class="fas fa-heart"></i></div>
-                        <p>It appears that you haven’t added any exercises to your favorites yet. To get started, you can add exercises that you like to your favorites for easier access in the future.</p>
-                    </div>
-                `;
-            } else {
-                // Render the four workout cards exactly as in first PNG
-                let cardsHTML = '';
-                filledWorkouts.forEach(w => {
-                    cardsHTML += `
-                        <div class="exercise-card">
-                            <div class="exercise-info">
-                                <div class="exercise-name">${w.name}</div>
-                                <div class="exercise-start">
-                                    ${w.startLink} <i class="fas fa-arrow-right"></i>
-                                </div>
-                            </div>
-                            <div class="exercise-meta">
-                                <span class="exercise-badge">${w.detail}</span>
-                                <div class="exercise-stats">
-                                    <span><strong>Burned calories:</strong> ${w.calories}</span>
-                                </div>
-                                <div class="exercise-body-target">
-                                    <span><strong>Body part:</strong> ${w.body}</span>
-                                    <span><strong>Target</strong> ${w.target}</span>
-                                </div>
-                            </div>
-                            <div class="start-btn">Start</div>
-                        </div>
-                    `;
-                });
-                container.innerHTML = cardsHTML;
-            }
+        <!-- ПРАВАЯ КОЛОНКА: упражнения или пустое состояние -->
+        <div class="favorites-container" id="favorites-container">
+          <!-- Пустое состояние — показывается, если нет данных:
+               должно быть на том же уровне, что и quote-card (top: 250px от container) -->
+          <div class="empty-state" id="empty-state">
+            It appears that you haven’t added any exercises to your favorites yet. To get started, you can add exercises that you like to your favorites for easier access in the future.
+          </div>
+ 
+        </div>
+      </div>
+    </div>
+  </main>
 
-            // Additional detail: the second PNG also shows the left column exactly same, and the right column empty
-            // We also need to reflect the exact "Start →" and other details. They're already done.
-            // The "Start" button on the right of each card is exactly as on first PNG.
-            // For empty, we added the icon and message exactly.
-        })();
-    </script>
+ <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-left">
+          <div class="footer-logo">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIQAAAAYCAYAAAA74FWfAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAStSURBVHgB7VldUiIxEA46Pi83WCz1WT2BwwnEE4AnAE7AeALxBOIJ1BM4nmDxWS25gey7P/t9Y0djSIYZhIKtylelmcl0upNO/yUoFRAQEBAQEBAQEPBDVLa3t2/QxvJef3h4SG2ira2tQaVSafL5/f299fj4eIFxPbwmXsaVyuD+/v7YxePl5WVzBNhjwPNdHlPMo14Doih6UvkYg28dsoY+goJ8MkAudZLgsSddPp08QW6t5Fx9MnwYQld1qGqsOyhnfX39RmRPAPszen195ZiRMccx+Ox7dH6JpsFn0O6vgZCbNhZm5/YATsAwhlERYxDa1s7OzrlaPKqQdQNZe2oBoE6ggqpaDvZgZDda/jRjIPiNNLJv2iGr4DOxFzCYlhJjwDrpwMOIVoMNPkNfj8zw3IEF9/UgkxEtD0zIIJGuMRh1HfPKeNEowO/O5PcD3KpJI6QRnKoPo2Bbn8YEdBeMXqoguA7ogA7QVcXhmmuejA7mdWf2UXfiiDSKDvlhoxNtDHRONCcWn0M0DZnzJfS+j/26ED4x9iK2ol1P88LeZrwi/kOU6ENYU4T1YFwDhimxoFgGnUkYig2GJ4gYA3uBoGHEuZTXuXgX5D9BVmp1p5DVzvMYG6AduVLAFHSgzOui4zxzzaO/s3lDHpumb4xOC1b3QKcJ8KwKXQfGQUOpSgbYFP40hpqMSzSvNf7j5lvhRec204L6joWMHXOl0p39/yn0Wk7VCsFVDwi62BfuZVfoOP/M+yUDJEwnSiKYLgP04Eg/0EJBnKqPiECP4KCafE5yJrBUYJGlIhA9RxTiwtgs4IS+Cxn0rD0qE3pKVIE5lZExT2Bzr+w+pmzMPUs/+GvD4Xf1N0YakzYyX1hggviP+gjzDekemha0RMQIh98KI0kVmUHYOdgHjKFC2q5v4lkDsw8KS5FOzzgOrz0Ur1d5JxpBAzIaRWWQL9bWtOhiyNTPufIwtg/aXat7DEM4Mt4ZMXii/NxbFpK2o38zCLPA1H0wkiO1ApDNb3k+X8FoO2pBgFGwoDuU3Eyj3FfzxefmO9B1eb0JMYbY7JOi8xPMAEaB+a2QNBHZHSwwjRoiXZVUIQtMzT4sjpZOi48ZoovMlcWxqx4SOEM5QzwchZ5ND8tSB/ioHFxDj50SMq7MekzSoI4wLAhzT2lycrqV56avyKZhY2+bIuPCpa8Jg5DFqxVECk85Njtg8ddYGE8zLITZTvVcFryzGLl4mE4d7RyP5qY8l5RxZp9KJA1QVmxfBdgwT3qgPVBftV9prKklYGNjY6IQnOXyh6FUh0Z9zFok6GEir6rmdJz2AcZgpgmXvmpqAYhUeZih7RRF1q+3t7e/JgGU1tMehPZZ2pH+DvpLeIB9qdJ2yZg3MLffvKDxfc+7a7BShxcM+bPKKAreRjp0+FlLzHr0L20Q9EoslhNhncHLjr4vfDK3YfEsUqmEBAvIrsElx/mutYdynb4QQHZL+YvTjCTnm506fGiorxqgtAwfpLg9oP7ydCgF40yHgZlShpzFT/JoaAwwnpbZx3f25wyb+DFnFcGNUQuMYj6wLuG9gX2CMGH+uKUCAgICAgICAgICloF/uJzH+KOtfxwAAAAASUVORK5CYII=" alt="YOUR ENERGY" />
+          </div>
+          <div class="social-footer">
+            <a href="#" aria-label="Facebook" class="social-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="Instagram" class="social-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="YouTube" class="social-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
 
-    <!-- small note: we include external js file reference (as per base) but our inline already works -->
-    <!-- <script src="js/favorites.js"></script> optionally, but we keep functionality inline -->
+        <div class="footer-center">
+          <h2>Transforming your body shape with us</h2>
+        </div>
+
+        <div class="footer-right">
+          <p class="subscribe-text">Subscribe and learn about new exercises!</p>
+          <form class="subscribe-form" id="subscribe-form">
+            <input type="email" placeholder="Email" required />
+            <button type="submit">Send</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="copyright">Your Energy. All rights reserved.</div>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a> / <a href="#">Terms of Service</a>
+        </div>
+        <div class="year">©2023</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/favorites.js"></script>
 </body>
 </html>
