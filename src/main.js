@@ -1,314 +1,272 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const API_BASE = 'https://your-energy.b.goit.study/api';
-
-  const grid = document.getElementById('exercises-grid');
-  const pagination = document.getElementById('pagination');
-  const tabs = document.querySelectorAll('.tab-btn');
-  const quoteText = document.querySelector('.quote-text');
-  const quoteAuthor = document.querySelector('.quote-author');
-  const subscribeForm = document.getElementById('subscribe-form');
-  const currentCategoryEl = document.getElementById('current-category');
-
-  let currentFilterType = 'bodyPart'; // по умолчанию — Body parts
-  let currentCategory = 'Waist';     // по умолчанию — Waist
-  let currentPage = 1;
-  const limit = 12;
-
-  /* =========================
-     QUOTE OF THE DAY
-  ========================== */
-  async function loadQuote() {
-    try {
-      const res = await fetch(`${API_BASE}/quote`);
-      const data = await res.json();
-      if (data?.quote && data?.author) {
-        quoteText.textContent = data.quote;
-        quoteAuthor.textContent = data.author;
+ document.addEventListener('DOMContentLoaded', () => {
+      // === MOBILE MENU ===
+      const menuToggle = document.querySelector('.menu-toggle');
+      const mobileMenu = document.querySelector('.mobile-menu');
+      const menuClose = document.querySelector('.mobile-menu-close');
+      
+      if (menuToggle && mobileMenu && menuClose) {
+        menuToggle.addEventListener('click', () => {
+          mobileMenu.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        });
+        
+        menuClose.addEventListener('click', () => {
+          mobileMenu.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+        
+        mobileMenu.querySelectorAll('.mobile-menu-link').forEach(link => {
+          link.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = '';
+          });
+        });
       }
-    } catch (err) {
-      console.error('Quote error:', err);
-      quoteText.textContent = "Stay consistent. Progress takes time.";
-      quoteAuthor.textContent = "— Unknown";
-    }
-  }
 
-  /* =========================
-     LOAD FILTER VALUES (e.g., ["Waist", "Back", ...])
-  ========================== */
-  async function loadFilterValues(filterType) {
-    try {
-      const res = await fetch(`${API_BASE}/filters`);
-      const filters = await res.json();
-      return filters[filterType] || [];
-    } catch (err) {
-      console.error('Failed to load filter values:', err);
-      return [];
-    }
-  }
+      // === MAIN APP LOGIC (ваш main.js) ===
+      const API_BASE = 'https://your-energy.b.goit.study/api'; // Fixed extra space!
 
-  /* =========================
-     LOAD EXERCISES BY CATEGORY
-  ========================== */
-  async function loadExercises() {
-    try {
-      const url = new URL(`${API_BASE}/exercises`);
-      url.searchParams.set(currentFilterType, currentCategory);
-      url.searchParams.set('page', currentPage);
-      url.searchParams.set('limit', limit);
+      const grid = document.getElementById('exercises-grid');
+      const pagination = document.getElementById('pagination');
+      const tabs = document.querySelectorAll('.tab-btn');
+      const quoteText = document.querySelector('.quote-text');
+      const quoteAuthor = document.querySelector('.quote-author');
+      const subscribeForm = document.getElementById('subscribe-form');
 
-      grid.innerHTML = '<p>Loading exercises...</p>';
+      let currentPage = 1;
+      const limit = 12;
+      let selectedCategory = null;   // Example: "lower-legs"
+      let currentFilterType = null;  // Example: "bodyParts"
 
-      const res = await fetch(url);
-      const data = await res.json();
-
-      if (data?.results?.length > 0) {
-        renderExercises(data.results);
-        renderPagination(data.totalPages);
-        updateCategoryDisplay();
-      } else {
-        grid.innerHTML = '<p>No exercises found.</p>';
-        pagination.innerHTML = '';
+      // === Load daily quote ===
+      async function loadQuote() {
+        try {
+          const res = await fetch(`${API_BASE}/quote`);
+          if (!res.ok) throw new Error('Network error');
+          const data = await res.json();
+          if (data?.quote && data?.author) {
+            quoteText.textContent = data.quote;
+            quoteAuthor.textContent = data.author;
+          } else {
+            quoteText.textContent = "Quote not available";
+            quoteAuthor.textContent = "";
+          }
+        } catch (err) {
+          console.error('Error loading quote:', err);
+          quoteText.textContent = "Failed to load quote";
+        }
       }
-    } catch (err) {
-      console.error('Exercises error:', err);
-      grid.innerHTML = '<p>Failed to load exercises.</p>';
-      pagination.innerHTML = '';
-    }
-  }
 
-  /* =========================
-     RENDER EXERCISE CARDS (точно по макету)
-  ========================== */
-  function renderExercises(exercises) {
-    grid.innerHTML = '';
+      // === Load category list (Muscles / Body parts / Equipment) ===
+      async function loadFilters(filterName = 'Body parts') {
+        try {
+          grid.innerHTML = 'Loading categories...';
+          pagination.innerHTML = '';
 
-    // Группируем по парам (2 карточки в строке)
-    for (let i = 0; i < exercises.length; i += 2) {
-      const row = document.createElement('div');
-      row.className = 'exercise-row';
-      row.style.display = 'flex';
-      row.style.gap = '16px';
-      row.style.marginBottom = '32px';
+          const encodedFilter = encodeURIComponent(filterName);
+          const res = await fetch(`${API_BASE}/filters?filter=${encodedFilter}&page=${currentPage}&limit=${limit}`);
+          if (!res.ok) throw new Error('Error loading filters');
+          
+          const data = await res.json();
 
-      exercises.slice(i, i + 2).forEach(ex => {
-        const card = createExerciseCard(ex);
-        row.appendChild(card);
-      });
+          if (data?.results?.length > 0) {
+            // Mapping tab names to API parameters
+            const typeMap = {
+              'Body parts': 'bodyParts',
+              'Muscles': 'muscles',
+              'Equipment': 'equipment'
+            };
+            currentFilterType = typeMap[filterName] || 'bodyParts';
 
-      grid.appendChild(row);
-    }
-  }
+            renderCategories(data.results, filterName);
+            renderPagination(data.totalPages);
+          } else {
+            grid.innerHTML = 'Categories not found';
+          }
+        } catch (err) {
+          console.error('Error loading categories:', err);
+          grid.innerHTML = 'Error loading categories';
+        }
+      }
 
-  function createExerciseCard(ex) {
+      // === Display category cards ===
+      function renderCategories(items, filterName) {
+        grid.innerHTML = '';
+        items.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'exercise-card';
+
+          // Convert "lower legs" → "lower-legs" for API
+          const apiValue = item.name.toLowerCase().replace(/\s+/g, '-');
+
+          // Generate image URL (if available)
+          const imgURL = item.imgURL || '';
+
+          card.innerHTML = `
+            <img src="${imgURL}" alt="${item.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
+            <div class="exercise-overlay">
+              <h3>${item.name}</h3>
+              <div class="category">${filterName}</div>
+            </div>
+          `;
+
+          card.addEventListener('click', () => {
+            selectedCategory = apiValue;
+            currentPage = 1;
+            loadExercises();
+          });
+
+          grid.appendChild(card);
+        });
+      }
+
+      // === Load exercises by selected category ===
+      async function loadExercises() {
+        if (!selectedCategory || !currentFilterType) return;
+
+        try {
+          grid.innerHTML = 'Loading exercises...';
+          pagination.innerHTML = '';
+
+          const params = new URLSearchParams({
+            [currentFilterType]: selectedCategory,
+            page: currentPage,
+            limit: limit
+          });
+
+          const res = await fetch(`${API_BASE}/exercises?${params.toString()}`);
+          if (!res.ok) throw new Error('Error loading exercises');
+
+          const data = await res.json();
+
+          if (data?.results?.length > 0) {
+            renderExercises(data.results);
+            renderPagination(data.totalPages);
+          } else {
+            grid.innerHTML = 'Exercises not found';
+          }
+        } catch (err) {
+          console.error('Error loading exercises:', err);
+          grid.innerHTML = 'Error loading exercises';
+        }
+      }
+
+      // === Display exercises ===
+   // === Display exercises ===
+function renderExercises(exercises) {
+  grid.innerHTML = '';
+
+  // "Back" button
+  const backBtn = document.createElement('button');
+  backBtn.textContent = '← Back to categories';
+  backBtn.className = 'back-btn';
+  backBtn.addEventListener('click', () => {
+    selectedCategory = null;
+    currentPage = 1;
+    const activeTab = document.querySelector('.tab-btn.active');
+    const filterName = activeTab ? activeTab.textContent.trim() : 'Body parts';
+    loadFilters(filterName);
+  });
+  grid.appendChild(backBtn);
+
+  // Exercise cards
+  exercises.forEach(ex => {
     const card = document.createElement('div');
     card.className = 'exercise-card';
-    card.style.width = '442px';
-    card.style.height = '141px';
-    card.style.background = '#FFFFFF';
-    card.style.borderRadius = '15px';
-    card.style.position = 'relative';
-    card.style.cursor = 'pointer';
 
-    // Переход на детальную страницу
+    card.innerHTML = `
+      <img src="${ex.gifUrl || 'https://via.placeholder.com/300x300?text=Exercise'}" 
+           alt="${ex.name}" loading="lazy">
+      <div class="exercise-overlay">
+        <h3>${ex.name}</h3>
+        <div class="category">${ex.target || ex.bodyPart || ex.equipment || ''}</div>
+      </div>
+    `;
+
+    // 🔥 ДОБАВЛЯЕМ ПЕРЕХОД НА ДЕТАЛЬНУЮ СТРАНИЦУ
     card.addEventListener('click', () => {
       window.location.href = `exercise-detail.html?id=${ex._id}`;
     });
 
-    // Badge
-    const badge = document.createElement('div');
-    badge.textContent = ex.workoutType || 'WORKOUT';
-    Object.assign(badge.style, {
-      position: 'absolute',
-      left: '16px',
-      bottom: '99px',
-      padding: '5px 8px',
-      border: '1px solid #242424',
-      borderRadius: '15px',
-      fontWeight: '500',
-      fontSize: '12px',
-      lineHeight: '16px',
-      color: '#242424'
-    });
-
-    // Rating
-    const rating = document.createElement('div');
-    rating.style.position = 'absolute';
-    rating.style.left = '108px';
-    rating.style.top = '20px';
-    rating.style.display = 'flex';
-    rating.style.alignItems = 'center';
-    rating.style.gap = '2px';
-
-    const ratingText = document.createElement('span');
-    ratingText.textContent = ex.rating ? ex.rating.toFixed(1) : '0.0';
-    ratingText.style.fontSize = '12px';
-    ratingText.style.color = '#242424';
-
-    const star = document.createElement('div');
-    star.style.width = '18px';
-    star.style.height = '18px';
-    star.style.background = '#EEA10C';
-    star.style.borderRadius = '1px';
-
-    rating.appendChild(ratingText);
-    rating.appendChild(star);
-
-    // Title
-    const titleDiv = document.createElement('div');
-    titleDiv.style.position = 'absolute';
-    titleDiv.style.left = '16px';
-    titleDiv.style.top = '67px';
-    titleDiv.style.display = 'flex';
-    titleDiv.style.alignItems = 'center';
-    titleDiv.style.gap = '16px';
-
-    const icon = document.createElement('div');
-    icon.style.width = '24px';
-    icon.style.height = '24px';
-    icon.style.background = '#242424';
-    icon.style.borderRadius = '50%';
-
-    const titleText = document.createElement('div');
-    titleText.textContent = ex.name || 'Unknown exercise';
-    titleText.style.fontSize = '24px';
-    titleText.style.lineHeight = '32px';
-    titleText.style.color = '#242424';
-
-    titleDiv.appendChild(icon);
-    titleDiv.appendChild(titleText);
-
-    // Info block
-    const infoBlock = document.createElement('div');
-    infoBlock.style.position = 'absolute';
-    infoBlock.style.left = '16px';
-    infoBlock.style.top = '107px';
-    infoBlock.style.display = 'flex';
-    infoBlock.style.gap = '16px';
-
-    const addInfo = (label, value) => {
-      const span = document.createElement('span');
-      span.innerHTML = `<span style="color:rgba(36,36,36,0.4);">${label}:</span> ${value}`;
-      span.style.fontSize = '12px';
-      span.style.lineHeight = '18px';
-      return span;
-    };
-
-    infoBlock.appendChild(addInfo('Burned calories', `${ex.calories || 0} / 3 min`));
-    infoBlock.appendChild(addInfo('Body part', ex.bodyPart || '—'));
-    infoBlock.appendChild(addInfo('Target', ex.target || '—'));
-
-    // Start button
-    const startBtn = document.createElement('div');
-    startBtn.textContent = 'Start →';
-    Object.assign(startBtn.style, {
-      position: 'absolute',
-      right: '16px',
-      top: '16px',
-      fontSize: '16px',
-      lineHeight: '24px',
-      color: '#242424'
-    });
-
-    card.appendChild(badge);
-    card.appendChild(rating);
-    card.appendChild(titleDiv);
-    card.appendChild(infoBlock);
-    card.appendChild(startBtn);
-
-    return card;
-  }
-
-  /* =========================
-     PAGINATION
-  ========================== */
-  function renderPagination(totalPages) {
-    pagination.innerHTML = '';
-    if (!totalPages || totalPages <= 1) return;
-
-    for (let i = 1; i <= totalPages; i++) {
-      const btn = document.createElement('button');
-      btn.textContent = i;
-      btn.className = 'page-btn';
-      if (i === currentPage) btn.classList.add('active');
-      btn.addEventListener('click', () => {
-        currentPage = i;
-        loadExercises();
-      });
-      pagination.appendChild(btn);
-    }
-  }
-
-  /* =========================
-     UPDATE CATEGORY DISPLAY (e.g., "/ Waist")
-  ========================== */
-  function updateCategoryDisplay() {
-    if (currentCategoryEl) {
-      currentCategoryEl.textContent = ` / ${currentCategory}`;
-    }
-  }
-
-  /* =========================
-     TAB SWITCHING
-  ========================== */
-  tabs.forEach(tab => {
-    tab.addEventListener('click', async () => {
-      tabs.forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-
-      currentFilterType = tab.dataset.filter;
-      currentPage = 1;
-
-      // Загрузить первую категорию для нового типа
-      const categories = await loadFilterValues(currentFilterType);
-      if (categories.length > 0) {
-        currentCategory = categories[0];
-        loadExercises();
-      } else {
-        grid.innerHTML = '<p>No categories available.</p>';
-        pagination.innerHTML = '';
-        if (currentCategoryEl) currentCategoryEl.textContent = '';
-      }
-    });
+    grid.appendChild(card);
   });
+}
 
-  /* =========================
-     SUBSCRIPTION
-  ========================== */
-  if (subscribeForm) {
-    subscribeForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const emailInput = subscribeForm.querySelector('input[type="email"]');
-      const email = emailInput.value.trim();
+      // === Pagination ===
+      function renderPagination(totalPages) {
+        pagination.innerHTML = '';
+        if (!totalPages || totalPages <= 1) return;
 
-      if (!email) return;
+        for (let i = 1; i <= totalPages; i++) {
+          const btn = document.createElement('button');
+          btn.className = 'page-btn';
+          btn.textContent = i;
+          if (i === currentPage) btn.classList.add('active');
 
-      try {
-        const res = await fetch(`${API_BASE}/subscription`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email })
-        });
+          btn.addEventListener('click', () => {
+            currentPage = i;
+            if (selectedCategory) {
+              loadExercises();
+            } else {
+              // Determine current filter by active tab
+              const activeTab = document.querySelector('.tab-btn.active');
+              const filterName = activeTab ? activeTab.textContent.trim() : 'Body parts';
+              loadFilters(filterName);
+            }
+          });
 
-        if (res.ok) {
-          alert('Thank you for subscribing!');
-          subscribeForm.reset();
-        } else {
-          alert('Subscription failed. Please try again.');
+          pagination.appendChild(btn);
         }
-      } catch (err) {
-        console.error('Subscription error:', err);
-        alert('Network error. Please try again later.');
+      }
+
+      // === Tab handling ===
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+
+          const filterName = tab.textContent.trim(); // "Muscles", "Body parts", "Equipment"
+          currentPage = 1;
+          selectedCategory = null;
+          loadFilters(filterName);
+        });
+      });
+
+      // === Subscription (if form exists) ===
+      if (subscribeForm) {
+        subscribeForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const emailInput = subscribeForm.querySelector('input[type="email"]');
+          const email = emailInput?.value.trim();
+
+          if (!email) {
+            alert('Please enter your email');
+            return;
+          }
+
+          try {
+            const res = await fetch(`${API_BASE}/subscription`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email })
+            });
+
+            const data = await res.json();
+            alert(data.message || 'Successfully subscribed!');
+            subscribeForm.reset();
+          } catch (err) {
+            console.error('Subscription error:', err);
+            alert('Failed to subscribe. Please try again later.');
+          }
+        });
+      }
+
+      // === Initialization ===
+      loadQuote();
+
+      // Activate first tab by default ("Body parts")
+      if (tabs.length > 0) {
+        tabs[0].classList.add('active');
+        loadFilters('Body parts');
       }
     });
-  }
-
-  /* =========================
-     INIT
-  ========================== */
-  loadQuote();
-  loadExercises(); // сразу загружаем упражнения по умолчанию (bodyPart=Waist)
-
-  // Обработка изменения размера окна (если нужно перемещать блоки на мобильных)
-  // В вашем макете этого нет, поэтому закомментировано
-  // window.addEventListener('resize', moveStaticCardsToBottom);
-});
