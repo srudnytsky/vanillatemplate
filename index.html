@@ -4,36 +4,70 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Your Energy</title>
-  <link rel="icon" href="./img/favicon.svg" type="image/svg+xml" />
-  <script type="module" crossorigin src="/vanillatemplate/index.js"></script>
-  <link rel="modulepreload" crossorigin href="/vanillatemplate/assets/layout-CNiZW9Jz.js">
-  <link rel="stylesheet" crossorigin href="/vanillatemplate/assets/layout-Dxc3fJ70.css">
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" crossorigin href="/vanillatemplate/assets/layout-BBKYc0BY.css">
 </head>
 <body>
-  <div id="app">
-    <!-- Header -->
-    <header class="header">
-      <div class="container">
-        <div class="logo">YOUR ENERGY</div>
-        <nav class="nav">
-          <a href="#" class="nav-link active">Home</a>
-          <a href="#" class="nav-link">Favorites</a>
-        </nav>
-        <div class="social">
-          <a href="#"><svg width="20" height="20"><use href="#icon-facebook"/></svg></a>
-          <a href="#"><svg width="20" height="20"><use href="#icon-instagram"/></svg></a>
-          <a href="#"><svg width="20" height="20"><use href="#icon-youtube"/></svg></a>
-        </div>
-      </div>
-    </header>
 
-    <!-- Hero -->
-    <section class="hero">
-      <div class="container">
-        <div class="hero-content">
-          <h1>Get Body in shape, Stay healthy</h1>
-          <p>Transform your physique and embrace a healthier lifestyle with our comprehensive fitness and nutrition support.</p>
-        </div>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="logo">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIQAAAAYCAYAAAA74FWfAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAStSURBVHgB7VldUiIxEA46Pi83WCz1WT2BwwnEE4AnAE7AeALxBOIJ1BM4nmDxWS25gey7P/t9Y0djSIYZhIKtylelmcl0upNO/yUoFRAQEBAQEBAQEPBDVLa3t2/QxvJef3h4SG2ira2tQaVSafL5/f299fj4eIFxPbwmXsaVyuD+/v7YxePl5WVzBNhjwPNdHlPMo14Doih6UvkYg28dsoY+goJ8MkAudZLgsSddPp08QW6t5Fx9MnwYQld1qGqsOyhnfX39RmRPAPszen195ZiRMccx+Ox7dH6JpsFn0O6vgZCbNhZm5/YATsAwhlERYxDa1s7OzrlaPKqQdQNZe2oBoE6ggqpaDvZgZDda/jRjIPiNNLJv2iGr4DOxFzCYlhJjwDrpwMOIVoMNPkNfj8zw3IEF9/UgkxEtD0zIIJGuMRh1HfPKeNEowO/O5PcD3KpJI6QRnKoPo2Bbn8YEdBeMXqoguA7ogA7QVcXhmmuejA7mdWf2UXfiiDSKDvlhoxNtDHRONCcWn0M0DZnzJfS+j/26ED4x9iK2ol1P88LeZrwi/kOU6ENYU4T1YFwDhimxoFgGnUkYig2GJ4gYA3uBoGHEuZTXuXgX5D9BVmp1p5DVzvMYG6AduVLAFHSgzOui4zxzzaO/s3lDHpumb4xOC1b3QKcJ8KwKXQfGQUOpSgbYFP40hpqMSzSvNf7j5lvhRec204L6joWMHXOl0p39/yn0Wk7VCsFVDwi62BfuZVfoOP/M+yUDJEwnSiKYLgP04Eg/0EJBnKqPiECP4KCafE5yJrBUYJGlIhA9RxTiwtgs4IS+Cxn0rD0qE3pKVIE5lZExT2Bzr+w+pmzMPUs/+GvD4Xf1N0YakzYyX1hggviP+gjzDekemha0RMQIh98KI0kVmUHYOdgHjKFC2q5v4lkDsw8KS5FOzzgOrz0Ur1d5JxpBAzIaRWWQL9bWtOhiyNTPufIwtg/aXat7DEM4Mt4ZMXii/NxbFpK2o38zCLPA1H0wkiO1ApDNb3k+X8FoO2pBgFGwoDuU3Eyj3FfzxefmO9B1eb0JMYbY7JOi8xPMAEaB+a2QNBHZHSwwjRoiXZVUIQtMzT4sjpZOi48ZoovMlcWxqx4SOEM5QzwchZ5ND8tSB/ioHFxDj50SMq7MekzSoI4wLAhzT2lycrqV56avyKZhY2+bIuPCpa8Jg5DFqxVECk85Njtg8ddYGE8zLITZTvVcFryzGLl4mE4d7RyP5qY8l5RxZp9KJA1QVmxfBdgwT3qgPVBftV9prKklYGNjY6IQnOXyh6FUh0Z9zFok6GEir6rmdJz2AcZgpgmXvmpqAYhUeZih7RRF1q+3t7e/JgGU1tMehPZZ2pH+DvpLeIB9qdJ2yZg3MLffvKDxfc+7a7BShxcM+bPKKAreRjp0+FlLzHr0L20Q9EoslhNhncHLjr4vfDK3YfEsUqmEBAvIrsElx/mutYdynb4QQHZL+YvTjCTnm506fGiorxqgtAwfpLg9oP7ydCgF40yHgZlShpzFT/JoaAwwnpbZx3f25wyb+DFnFcGNUQuMYj6wLuG9gX2CMGH+uKUCAgICAgICAgICloF/uJzH+KOtfxwAAAAASUVORK5CYII=" alt="YOUR ENERGY" />
+      </div>
+      
+      <!-- Бургер-меню ТОЛЬКО для мобильных -->
+      <button class="menu-toggle" aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <div class="nav-pills">
+        <button class="nav-pill active">Home</button>
+        <button class="nav-pill">Favorites</button>
+      </div>
+
+      <div class="social-header">
+        <a href="#" aria-label="Facebook">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </a>
+        <a href="#" aria-label="Instagram">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+          </svg>
+        </a>
+        <a href="#" aria-label="YouTube">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Модальное меню ТОЛЬКО для мобильных -->
+    <div class="mobile-menu">
+      <button class="mobile-menu-close">×</button>
+      <div class="mobile-menu-links">
+        <a href="#" class="mobile-menu-link">Home</a>
+        <a href="#" class="mobile-menu-link">Favorites</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1>
+          <span class="star-icon">✦</span> Get Body in shape, Stay healthy
+        </h1>
+        <p class="hero-subtitle">
+          Transform your physique and embrace a healthier lifestyle with our comprehensive fitness and nutrition support.
+        </p>
         <div class="hero-tags">
           <span class="tag">#Sport</span>
           <span class="tag">#Healthy</span>
@@ -41,192 +75,107 @@
           <span class="tag">#Diet</span>
         </div>
       </div>
-      <img src="/vanillatemplate/assets/hero-Dz8P5uDH.jpg" alt="Two women high-fiving" class="hero-img" />
-    </section>
+      <div class="hero-mini-img">
+        <img src="/vanillatemplate/assets/hero-min-AYiKi208.png" alt="Mini high-five" />
+      </div>
+      <img src="/vanillatemplate/assets/hero-Dz8P5uDH.jpg" alt="Two women high-five in plank near water" class="hero-img" />
+    </div>
+  </section>
 
-    <!-- Exercises -->
-    <section class="exercises">
-      <div class="container">
-        <h2>Exercises</h2>
+  <!-- Exercises -->
+  <section class="exercises">
+    <div class="container">
+      <div class="exercises-header">
+        <h2>Exercises <span id="current-category"></span></h2>
         <div class="filters">
-          <button class="filter-btn active" data-filter="Muscles">Muscles</button>
-          <button class="filter-btn" data-filter="Body parts">Body parts</button>
-          <button class="filter-btn" data-filter="Equipment">Equipment</button>
-        </div>
-
-        <div class="exercises-grid">
-          <!-- Row 1 -->
-          <div class="quote-card">
-            <div class="quote-icon">"</div>
-            <p class="quote-text">A lot of times I find that people who are blessed with the most talent don't ever develop that attitude, and the ones who aren't blessed in that way are the most competitive and have the biggest heart.</p>
-            <div class="quote-author">Tom Brady</div>
-          </div>
-          
-          <!-- Muscles -->
-          <div class="exercise-card" data-filter="Muscles">
-            <img src="/vanillatemplate/assets/exercise-1-B9LfNaE1.jpg" alt="Abductors" />
-            <div class="exercise-overlay">
-              <h3>Abductors</h3>
-              <div class="category">Muscles</div>
-            </div>
-          </div>
-          <div class="exercise-card" data-filter="Muscles">
-            <img src="/vanillatemplate/assets/exercise-2--ZGIYTjU.jpg" alt="Abs" />
-            <div class="exercise-overlay">
-              <h3>Abs</h3>
-              <div class="category">Muscles</div>
-            </div>
-          </div>
-          <div class="exercise-card" data-filter="Muscles">
-            <img src="/vanillatemplate/assets/exercise-3-MEUS0Hvy.jpg" alt="Adductors" />
-            <div class="exercise-overlay">
-              <h3>Adductors</h3>
-              <div class="category">Muscles</div>
-            </div>
-          </div>
-
-          <!-- Row 2 -->
-          <div class="info-card">
-            <div class="info-icon">⏱️</div>
-            <div>
-              <h3>110 min</h3>
-              <p>Daily norm of sports</p>
-              <div class="info-text">
-                The World Health Organization recommends at least 150 minutes of moderate-intensity aerobic physical activity throughout the week for adults aged 18-64.
-              </div>
-            </div>
-          </div>
-          
-          <!-- Body parts -->
-          <div class="exercise-card" data-filter="Body parts">
-            <img src="/vanillatemplate/assets/exercise-4-kOBNIi_R.jpg" alt="Biceps" />
-            <div class="exercise-overlay">
-              <h3>Biceps</h3>
-              <div class="category">Body parts</div>
-            </div>
-          </div>
-          <div class="exercise-card" data-filter="Body parts">
-            <img src="/vanillatemplate/assets/exercise-5-DuPe135w.jpg" alt="Calves" />
-            <div class="exercise-overlay">
-              <h3>Calves</h3>
-              <div class="category">Body parts</div>
-            </div>
-          </div>
-          <div class="exercise-card" data-filter="Body parts">
-            <img src="/vanillatemplate/assets/exercise-6-DKBfJ0x3.jpg" alt="Cardiovascular System" />
-            <div class="exercise-overlay">
-              <h3>Cardiovascular System</h3>
-              <div class="category">Body parts</div>
-            </div>
-          </div>
-
-          <!-- Row 3 -->
-          <!-- Equipment -->
-          <div class="exercise-card" data-filter="Equipment">
-            <img src="/vanillatemplate/assets/exercise-7-Cwd2uOT5.jpg" alt="Dumbbells" />
-            <div class="exercise-overlay">
-              <h3>Dumbbells</h3>
-              <div class="category">Equipment</div>
-            </div>
-          </div>
-          <div class="exercise-card" data-filter="Equipment">
-            <img src="/vanillatemplate/assets/exercise-8-BTDYvJdb.jpg" alt="Barbell" />
-            <div class="exercise-overlay">
-              <h3>Barbell</h3>
-              <div class="category">Equipment</div>
-            </div>
-          </div>
-          <div class="exercise-card" data-filter="Equipment">
-            <img src="/vanillatemplate/assets/exercise-9-7SOdYMMo.jpg" alt="Resistance Band" />
-            <div class="exercise-overlay">
-              <h3>Resistance Band</h3>
-              <div class="category">Equipment</div>
-            </div>
-          </div>
-
-          <!-- Row 4 -->
-          <!-- Mix of categories -->
-          <div class="exercise-card" data-filter="Muscles">
-            <img src="/vanillatemplate/assets/exercise-10-CcKJwL0w.jpg" alt="Hamstrings" />
-            <div class="exercise-overlay">
-              <h3>Hamstrings</h3>
-              <div class="category">Muscles</div>
-            </div>
-          </div>
-          <div class="exercise-card" data-filter="Body parts">
-            <img src="/vanillatemplate/assets/exercise-11-nVKgW_Bk.jpg" alt="Lats" />
-            <div class="exercise-overlay">
-              <h3>Lats</h3>
-              <div class="category">Body parts</div>
-            </div>
-          </div>
-          <div class="exercise-card" data-filter="Equipment">
-            <img src="/vanillatemplate/assets/exercise-11-nVKgW_Bk.jpg" alt="Kettlebell" />
-            <div class="exercise-overlay">
-              <h3>Kettlebell</h3>
-              <div class="category">Equipment</div>
-            </div>
-          </div>
-          
-   
-
-        <!-- Pagination -->
-        <div class="pagination">
-          <button class="page-btn active">1</button>
-          <button class="page-btn">2</button>
+          <button class="tab-btn active" data-filter="bodyPart">Body parts</button>
+          <button class="tab-btn" data-filter="muscles">Muscles</button>
+          <button class="tab-btn" data-filter="equipment">Equipment</button>
         </div>
       </div>
-    </section>
 
-    <!-- CTA -->
-    <section class="cta">
-      <div class="container">
-        <div class="cta-content">
+      <!-- Сетка: цитата + info-card + динамический контент -->
+      <div class="exercises-grid-container">
+        <!-- Quote of the day -->
+        <div class="quote-card" id="quote-card">
+          <div class="quote-icon"></div>
+          <p class="quote-text" id="daily-quote">Loading quote...</p>
+          <div class="quote-author" id="quote-author"></div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="info-card">
+          <div class="info-icon">⏱️</div>
+          <div>
+            <h3>110 min</h3>
+            <p class="info-title">Daily norm of sports</p>
+            <div class="info-text">
+              The World Health Organization recommends at least 150 minutes of moderate-intensity aerobic physical activity throughout the week for adults aged 18–64. However, what happens if we adjust that number to 110 minutes every day? While it might seem like a high number to hit, dedicating 110 minutes daily to sporting activities may offer unparalleled benefits to physical health, mental well-being, and overall quality of life.
+            </div>
+          </div>
+        </div>
+
+        <!-- Динамический контент от JS -->
+        <div class="exercises-grid" id="exercises-grid">
+          <!-- JavaScript заполнит это содержимое -->
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-left">
+          <div class="footer-logo">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIQAAAAYCAYAAAA74FWfAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAStSURBVHgB7VldUiIxEA46Pi83WCz1WT2BwwnEE4AnAE7AeALxBOIJ1BM4nmDxWS25gey7P/t9Y0djSIYZhIKtylelmcl0upNO/yUoFRAQEBAQEBAQEPBDVLa3t2/QxvJef3h4SG2ira2tQaVSafL5/f299fj4eIFxPbwmXsaVyuD+/v7YxePl5WVzBNhjwPNdHlPMo14Doih6UvkYg28dsoY+goJ8MkAudZLgsSddPp08QW6t5Fx9MnwYQld1qGqsOyhnfX39RmRPAPszen195ZiRMccx+Ox7dH6JpsFn0O6vgZCbNhZm5/YATsAwhlERYxDa1s7OzrlaPKqQdQNZe2oBoE6ggqpaDvZgZDda/jRjIPiNNLJv2iGr4DOxFzCYlhJjwDrpwMOIVoMNPkNfj8zw3IEF9/UgkxEtD0zIIJGuMRh1HfPKeNEowO/O5PcD3KpJI6QRnKoPo2Bbn8YEdBeMXqoguA7ogA7QVcXhmmuejA7mdWf2UXfiiDSKDvlhoxNtDHRONCcWn0M0DZnzJfS+j/26ED4x9iK2ol1P88LeZrwi/kOU6ENYU4T1YFwDhimxoFgGnUkYig2GJ4gYA3uBoGHEuZTXuXgX5D9BVmp1p5DVzvMYG6AduVLAFHSgzOui4zxzzaO/s3lDHpumb4xOC1b3QKcJ8KwKXQfGQUOpSgbYFP40hpqMSzSvNf7j5lvhRec204L6joWMHXOl0p39/yn0Wk7VCsFVDwi62BfuZVfoOP/M+yUDJEwnSiKYLgP04Eg/0EJBnKqPiECP4KCafE5yJrBUYJGlIhA9RxTiwtgs4IS+Cxn0rD0qE3pKVIE5lZExT2Bzr+w+pmzMPUs/+GvD4Xf1N0YakzYyX1hggviP+gjzDekemha0RMQIh98KI0kVmUHYOdgHjKFC2q5v4lkDsw8KS5FOzzgOrz0Ur1d5JxpBAzIaRWWQL9bWtOhiyNTPufIwtg/aXat7DEM4Mt4ZMXii/NxbFpK2o38zCLPA1H0wkiO1ApDNb3k+X8FoO2pBgFGwoDuU3Eyj3FfzxefmO9B1eb0JMYbY7JOi8xPMAEaB+a2QNBHZHSwwjRoiXZVUIQtMzT4sjpZOi48ZoovMlcWxqx4SOEM5QzwchZ5ND8tSB/ioHFxDj50SMq7MekzSoI4wLAhzT2lycrqV56avyKZhY2+bIuPCpa8Jg5DFqxVECk85Njtg8ddYGE8zLITZTvVcFryzGLl4mE4d7RyP5qY8l5RxZp9KJA1QVmxfBdgwT3qgPVBftV9prKklYGNjY6IQnOXyh6FUh0Z9zFok6GEir6rmdJz2AcZgpgmXvmpqAYhUeZih7RRF1q+3t7e/JgGU1tMehPZZ2pH+DvpLeIB9qdJ2yZg3MLffvKDxfc+7a7BShxcM+bPKKAreRjp0+FlLzHr0L20Q9EoslhNhncHLjr4vfDK3YfEsUqmEBAvIrsElx/mutYdynb4QQHZL+YvTjCTnm506fGiorxqgtAwfpLg9oP7ydCgF40yHgZlShpzFT/JoaAwwnpbZx3f25wyb+DFnFcGNUQuMYj6wLuG9gX2CMGH+uKUCAgICAgICAgICloF/uJzH+KOtfxwAAAAASUVORK5CYII=" alt="YOUR ENERGY" />
+          </div>
+          <div class="social-footer">
+            <a href="#" aria-label="Facebook" class="social-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="Instagram" class="social-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+              </svg>
+            </a>
+            <a href="#" aria-label="YouTube" class="social-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-center">
           <h2>Transforming your body shape with us</h2>
-          <p>Subscribe and learn about new exercises!</p>
-          <form id="subscribe-form">
+        </div>
+
+        <div class="footer-right">
+          <p class="subscribe-text">Subscribe and learn about new exercises!</p>
+          <form class="subscribe-form" id="subscribe-form">
             <input type="email" placeholder="Email" required />
             <button type="submit">Send</button>
           </form>
         </div>
       </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-top">
-          <div class="logo">YOUR ENERGY</div>
-          <div class="social">
-            <a href="#"><svg width="20" height="20"><use href="#icon-facebook"/></svg></a>
-            <a href="#"><svg width="20" height="20"><use href="#icon-instagram"/></svg></a>
-            <a href="#"><svg width="20" height="20"><use href="#icon-youtube"/></svg></a>
-          </div>
+      <div class="footer-bottom">
+        <div class="copyright">Your Energy. All rights reserved.</div>
+        <div class="footer-links">
+          <a href="#">Privacy Policy</a> / <a href="#">Terms of Service</a>
         </div>
-        <div class="footer-bottom">
-          <div>Your Energy. All rights reserved.</div>
-          <div>
-            <a href="#">Privacy Policy</a> / 
-            <a href="#">Terms of Service</a>
-          </div>
-          <div class="copyright">©2023</div>
-        </div>
+        <div class="year">©2023</div>
       </div>
-    </footer>
-  </div>
+    </div>
+  </footer>
 
-  <!-- SVG sprites -->
-  <svg style="display: none">
-    <symbol id="icon-facebook" viewBox="0 0 24 24">
-      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.39 10.95-1.688 12.707 0 0 1.37 2.485 4.37 2.485 1.68 0 3.36-.01 4.37-.01.38 0 .75 0 1.125.01 1.205 0 2.41-.01 3.36-.01 1.47 0 2.94-.01 4.37-.01 2.99 0 4.37-2.485 4.37-2.485C28.47 22.95 32.86 17.99 32.86 12.073z"/>
-    </symbol>
-    <symbol id="icon-instagram" viewBox="0 0 24 24">
-      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.057 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771 4.919 4.919-1.266.058-1.644.07-4.85.07-3.205 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.28-.073 1.688-.073 4.948 0 3.259.014 3.668.072 4.947.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.667-.014 4.947-.072 4.354-.2 6.781-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-    </symbol>
-    <symbol id="icon-youtube" viewBox="0 0 24 24">
-      <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 1.168a1.832 1.832 0 00-1.832 1.832v10.615a1.832 1.832 0 001.832 1.832h10.615a1.832 1.832 0 001.832-1.832V5.184a1.832 1.832 0 00-1.832-1.832H8.999z"/>
-    </symbol>
-  </svg>
-
+  <script src="js/main.js"></script>
 </body>
 </html>
