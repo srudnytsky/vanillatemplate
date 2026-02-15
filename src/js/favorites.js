@@ -23,109 +23,102 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // === API AND STORAGE ===
+  // === MAIN APP LOGIC ===
   const API_BASE = 'https://your-energy.b.goit.study/api';
-  const favoritesContent = document.getElementById('favorites-content');
-  const quoteText = document.getElementById('fav-quote-text');
-  const quoteAuthor = document.getElementById('fav-quote-author');
-  const subscribeForm = document.getElementById('subscribe-form');
 
-  // === FAVORITES MANAGEMENT ===
+  const grid = document.getElementById('exercises-grid');
+  const pagination = document.getElementById('pagination');
+  const tabs = document.querySelectorAll('.tab-btn');
+  const quoteText = document.querySelector('.quote-text');
+  const quoteAuthor = document.querySelector('.quote-author');
+  const subscribeForm = document.getElementById('subscribe-form');
+  const categoryTitle = document.getElementById('current-category');
+  const searchInput = document.getElementById('exercise-search');
+  const searchBtn = document.getElementById('search-btn');
+
+  let currentPage = 1;
+  const limit = 12;
+  let selectedCategory = null;
+  let currentFilterType = null;
+  let searchQuery = '';
+  let currentExercise = null; // Добавлено для хранения текущего упражнения
+
+  // === FAVORITES FUNCTIONS ===
   function getFavorites() {
-    const favorites = localStorage.getItem('favorites');
-    return favorites ? JSON.parse(favorites) : [];
+    try {
+      return JSON.parse(localStorage.getItem('favorites')) || [];
+    } catch {
+      return [];
+    }
   }
 
   function saveFavorites(favorites) {
     localStorage.setItem('favorites', JSON.stringify(favorites));
   }
 
-  function removeFavorite(exerciseId) {
-    let favorites = getFavorites();
-    favorites = favorites.filter(fav => fav._id !== exerciseId);
-    saveFavorites(favorites);
-    renderFavorites();
-  }
-
-  // === RENDER FAVORITES ===
-  function renderFavorites() {
-    if (!favoritesContent) return;
-
+  function isFavorite(exerciseId) {
     const favorites = getFavorites();
+    return favorites.some(fav => fav._id === exerciseId);
+  }
 
-    if (favorites.length === 0) {
-      // Show empty state
-      favoritesContent.innerHTML = `
-        <div class="empty-state">
-          It appears that you haven't added any exercises to your favorites yet. To get started, you can add exercises that you like to your favorites for easier access in the future.
-        </div>
-      `;
-      return;
-    }
-
-    // Render exercise cards
-    favoritesContent.innerHTML = '';
+  function updateFavoriteButton(exerciseId) {
+    const addFavoritesBtn = document.getElementById('modal-add-favorites');
+    if (!addFavoritesBtn) return;
     
-    favorites.forEach(exercise => {
-      const card = document.createElement('div');
-      card.className = 'favorite-exercise-card';
-      
-      card.innerHTML = `
-        <div class="favorite-card-header">
-          <span class="favorite-workout-badge">WORKOUT</span>
-          <button class="favorite-delete-btn" data-id="${exercise._id}" aria-label="Remove from favorites">
-            🗑
-          </button>
-        </div>
-        
-        <div class="favorite-exercise-info">
-          <div class="favorite-exercise-icon">⚡</div>
-          <h3 class="favorite-exercise-name">${exercise.name}</h3>
-        </div>
-        
-        <div class="favorite-exercise-details">
-          <span><span class="label">Burned calories:</span> <span class="value">${exercise.burnedCalories || 0} / ${exercise.time || 0} min</span></span>
-          <span><span class="label">Body part:</span> <span class="value">${exercise.bodyPart || ''}</span></span>
-          <span><span class="label">Target:</span> <span class="value">${exercise.target || ''}</span></span>
-        </div>
-        
-        <div class="favorite-card-footer">
-          <button class="favorite-start-btn" data-id="${exercise._id}">
-            Start
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M12.172 7L6.808 1.636L8.222 0.222L16 8L8.222 15.778L6.808 14.364L12.172 9H0V7H12.172Z" fill="currentColor"/>
-            </svg>
-          </button>
-        </div>
-      `;
+    if (isFavorite(exerciseId)) {
+      addFavoritesBtn.innerHTML = 'Remove from favorites ♥';
+      addFavoritesBtn.style.color = '#EEA10C';
+      addFavoritesBtn.style.borderColor = '#EEA10C';
+    } else {
+      addFavoritesBtn.innerHTML = 'Add to favorites ♡';
+      addFavoritesBtn.style.color = '#F4F4F4';
+      addFavoritesBtn.style.borderColor = 'rgba(244, 244, 244, 0.2)';
+    }
+  }
 
-      favoritesContent.appendChild(card);
-    });
+  // === RATING MODAL FUNCTIONS ===
+  let selectedRating = 0;
 
-    // Add event listeners to delete buttons
-    document.querySelectorAll('.favorite-delete-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const exerciseId = btn.getAttribute('data-id');
-        if (confirm('Remove this exercise from favorites?')) {
-          removeFavorite(exerciseId);
-        }
-      });
-    });
+  function openRatingModal() {
+    const ratingModal = document.getElementById('rating-modal');
+    if (!ratingModal) return;
+    
+    closeExerciseModal();
+    ratingModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    selectedRating = 0;
+    updateRatingStars(0);
+    
+    const ratingCurrent = document.querySelector('.rating-current');
+    if (ratingCurrent) ratingCurrent.textContent = '0.0';
+    
+    const ratingForm = document.getElementById('rating-form');
+    if (ratingForm) ratingForm.reset();
+  }
 
-    // Add event listeners to start buttons
-    document.querySelectorAll('.favorite-start-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const exerciseId = btn.getAttribute('data-id');
-        const exercise = favorites.find(fav => fav._id === exerciseId);
-        if (exercise) {
-          // Navigate to index page or open modal
-          window.location.href = `index.html`;
-        }
-      });
+  function closeRatingModal() {
+    const ratingModal = document.getElementById('rating-modal');
+    if (ratingModal) {
+      ratingModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function updateRatingStars(rating) {
+    const ratingStarsInput = document.querySelectorAll('.star-input');
+    ratingStarsInput.forEach((star, index) => {
+      const starValue = parseFloat(star.getAttribute('data-rating'));
+      if (starValue <= rating) {
+        star.classList.add('active');
+        star.textContent = '⭐';
+      } else {
+        star.classList.remove('active');
+        star.textContent = '☆';
+      }
     });
   }
 
-  // === LOAD DAILY QUOTE ===
+  // === Load daily quote ===
   async function loadQuote() {
     try {
       const res = await fetch(`${API_BASE}/quote`);
@@ -144,7 +137,445 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // === SUBSCRIPTION ===
+  // === Load category list ===
+  async function loadFilters(filterName = 'Body parts') {
+    try {
+      grid.innerHTML = 'Loading categories...';
+      grid.classList.add('category-grid');
+      pagination.innerHTML = '';
+      if (categoryTitle) categoryTitle.textContent = '';
+
+      const encodedFilter = encodeURIComponent(filterName);
+      const res = await fetch(`${API_BASE}/filters?filter=${encodedFilter}&page=${currentPage}&limit=${limit}`);
+      if (!res.ok) throw new Error('Error loading filters');
+      
+      const data = await res.json();
+
+      if (data?.results?.length > 0) {
+        const typeMap = {
+          'Body parts': 'bodyPart',
+          'Muscles': 'muscles',
+          'Equipment': 'equipment'
+        };
+        currentFilterType = typeMap[filterName] || 'bodyPart';
+        renderCategories(data.results, filterName);
+        renderPagination(data.totalPages);
+      } else {
+        grid.innerHTML = 'Categories not found';
+      }
+    } catch (err) {
+      console.error('Error loading categories:', err);
+      grid.innerHTML = 'Error loading categories';
+    }
+  }
+
+  // === Display category cards ===
+  function renderCategories(items, filterName) {
+    grid.innerHTML = '';
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'exercise-card';
+
+      const apiValue = item.name.toLowerCase().replace(/\s+/g, '-');
+      const imgURL = item.imgURL || '';
+
+      card.innerHTML = `
+        <img src="${imgURL}" alt="${item.name}" loading="lazy" onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'">
+        <div class="exercise-overlay">
+          <h3>${item.name}</h3>
+          <div class="category">${filterName}</div>
+        </div>
+      `;
+
+      card.addEventListener('click', () => {
+        selectedCategory = apiValue;
+        currentPage = 1;
+        if (categoryTitle) categoryTitle.textContent = item.name;
+        loadExercises();
+      });
+
+      grid.appendChild(card);
+    });
+  }
+
+  // === Load exercises by selected category ===
+  async function loadExercises() {
+    if (!selectedCategory || !currentFilterType) return;
+
+    try {
+      grid.innerHTML = 'Loading exercises...';
+      grid.classList.remove('category-grid');
+      pagination.innerHTML = '';
+
+      const params = new URLSearchParams({
+        [currentFilterType]: selectedCategory,
+        page: currentPage,
+        limit: limit
+      });
+
+      if (searchQuery) {
+        params.append('keyword', searchQuery);
+      }
+
+      const res = await fetch(`${API_BASE}/exercises?${params.toString()}`);
+      if (!res.ok) throw new Error('Error loading exercises');
+
+      const data = await res.json();
+
+      if (data?.results?.length > 0) {
+        renderExercises(data.results);
+        renderPagination(data.totalPages);
+      } else {
+        grid.innerHTML = '<p style="text-align: center; padding: 40px;">No exercises found</p>';
+      }
+    } catch (err) {
+      console.error('Error loading exercises:', err);
+      grid.innerHTML = 'Error loading exercises';
+    }
+  }
+
+  // === Display exercises in horizontal card format ===
+  function renderExercises(exercises) {
+    grid.innerHTML = '';
+
+    const backBtn = document.createElement('button');
+    backBtn.textContent = '← Back to categories';
+    backBtn.className = 'back-btn';
+    backBtn.addEventListener('click', () => {
+      selectedCategory = null;
+      currentPage = 1;
+      searchQuery = '';
+      if (searchInput) searchInput.value = '';
+      if (categoryTitle) categoryTitle.textContent = '';
+      const activeTab = document.querySelector('.tab-btn.active');
+      const filterName = activeTab ? activeTab.textContent.trim() : 'Body parts';
+      loadFilters(filterName);
+    });
+    grid.appendChild(backBtn);
+
+    exercises.forEach(ex => {
+      const card = document.createElement('div');
+      card.className = 'exercise-card-horizontal';
+
+      const rating = ex.rating || 0;
+      const fullStars = Math.floor(rating);
+      const halfStar = rating % 1 >= 0.5;
+
+      card.innerHTML = `
+        <div class="exercise-card-left">
+          <div class="workout-badge">
+            WORKOUT ${rating.toFixed(1)} ⭐
+          </div>
+          <div class="exercise-info">
+            <h3>${ex.name}</h3>
+            <div class="exercise-details">
+              <span><span class="label">Burned calories:</span> ${ex.burnedCalories || 0} / ${ex.time || 0} min</span>
+              <span><span class="label">Body part:</span> ${ex.bodyPart || ''}</span>
+              <span><span class="label">Target:</span> ${ex.target || ''}</span>
+            </div>
+          </div>
+        </div>
+        <button class="start-btn">
+          Start
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M12.172 7L6.808 1.636L8.222 0.222L16 8L8.222 15.778L6.808 14.364L12.172 9H0V7H12.172Z" fill="currentColor"/>
+          </svg>
+        </button>
+      `;
+
+      const startBtn = card.querySelector('.start-btn');
+      startBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        openExerciseModal(ex);
+      });
+
+      grid.appendChild(card);
+    });
+  }
+
+  // === Open Exercise Modal ===
+  function openExerciseModal(exercise) {
+    const modal = document.getElementById('exercise-modal');
+    if (!modal) return;
+
+    currentExercise = exercise; // Сохраняем текущее упражнение
+
+    const modalImg = document.getElementById('modal-exercise-img');
+    const modalName = document.getElementById('modal-exercise-name');
+    const modalRating = document.getElementById('modal-rating-stars');
+    const modalTarget = document.getElementById('modal-target');
+    const modalBodyPart = document.getElementById('modal-body-part');
+    const modalEquipment = document.getElementById('modal-equipment');
+    const modalPopularity = document.getElementById('modal-popularity');
+    const modalCalories = document.getElementById('modal-calories');
+    const modalDescription = document.getElementById('modal-description-text');
+
+    if (modalImg) modalImg.src = exercise.gifUrl || 'https://via.placeholder.com/300x300?text=Exercise';
+    if (modalName) modalName.textContent = exercise.name || '';
+    
+    const rating = exercise.rating || 0;
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    let starsDisplay = `${rating.toFixed(1)} `;
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        starsDisplay += '⭐';
+      } else if (i === fullStars && hasHalfStar) {
+        starsDisplay += '⭐';
+      } else {
+        starsDisplay += '☆';
+      }
+    }
+    if (modalRating) modalRating.textContent = starsDisplay;
+    
+    if (modalTarget) modalTarget.textContent = exercise.target || '';
+    if (modalBodyPart) modalBodyPart.textContent = exercise.bodyPart || '';
+    if (modalEquipment) modalEquipment.textContent = exercise.equipment || '';
+    if (modalPopularity) modalPopularity.textContent = exercise.popularity || '0';
+    if (modalCalories) modalCalories.textContent = `${exercise.burnedCalories || 0}/${exercise.time || 0} min`;
+    if (modalDescription) modalDescription.textContent = exercise.description || 'No description available.';
+
+    updateFavoriteButton(exercise._id);
+
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // === Close Exercise Modal ===
+  function closeExerciseModal() {
+    const modal = document.getElementById('exercise-modal');
+    if (modal) {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+
+  // === Modal event listeners ===
+  const modalCloseBtn = document.getElementById('modal-close');
+  const modalOverlay = document.querySelector('.modal-overlay');
+  
+  if (modalCloseBtn) {
+    modalCloseBtn.addEventListener('click', closeExerciseModal);
+  }
+  
+  if (modalOverlay) {
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) {
+        closeExerciseModal();
+        closeRatingModal();
+      }
+    });
+  }
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeExerciseModal();
+      closeRatingModal();
+    }
+  });
+
+  // === Favorites button functionality ===
+  const addFavoritesBtn = document.getElementById('modal-add-favorites');
+  if (addFavoritesBtn) {
+    addFavoritesBtn.addEventListener('click', () => {
+      if (!currentExercise) {
+        alert('No exercise selected');
+        return;
+      }
+
+      const favorites = getFavorites();
+      const exerciseId = currentExercise._id;
+      const favoriteIndex = favorites.findIndex(fav => fav._id === exerciseId);
+
+      if (favoriteIndex > -1) {
+        favorites.splice(favoriteIndex, 1);
+        saveFavorites(favorites);
+        updateFavoriteButton(exerciseId);
+        alert('Removed from favorites!');
+      } else {
+        favorites.push(currentExercise);
+        saveFavorites(favorites);
+        updateFavoriteButton(exerciseId);
+        alert('Added to favorites!');
+      }
+    });
+  }
+
+  // === Rating button functionality ===
+  const giveRatingBtn = document.getElementById('modal-give-rating');
+  if (giveRatingBtn) {
+    giveRatingBtn.addEventListener('click', () => {
+      if (!currentExercise) {
+        alert('No exercise selected');
+        return;
+      }
+      openRatingModal();
+    });
+  }
+
+  // === Rating modal stars functionality ===
+  const ratingStarsInput = document.querySelectorAll('.star-input');
+  const ratingCurrent = document.querySelector('.rating-current');
+  const ratingStarsContainer = document.querySelector('.rating-stars-input');
+  const ratingModalClose = document.getElementById('rating-modal-close');
+  const ratingForm = document.getElementById('rating-form');
+
+  // Star click handlers
+  ratingStarsInput.forEach(star => {
+    star.addEventListener('click', () => {
+      const rating = parseFloat(star.getAttribute('data-rating'));
+      selectedRating = rating;
+      updateRatingStars(rating);
+      if (ratingCurrent) ratingCurrent.textContent = rating.toFixed(1);
+    });
+
+    star.addEventListener('mouseenter', () => {
+      const rating = parseFloat(star.getAttribute('data-rating'));
+      updateRatingStars(rating);
+    });
+  });
+
+  // Reset stars on mouse leave
+  if (ratingStarsContainer) {
+    ratingStarsContainer.addEventListener('mouseleave', () => {
+      updateRatingStars(selectedRating);
+    });
+  }
+
+  // Close rating modal
+  if (ratingModalClose) {
+    ratingModalClose.addEventListener('click', closeRatingModal);
+  }
+
+  // Submit rating form
+  if (ratingForm) {
+    ratingForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!currentExercise) {
+        alert('No exercise selected');
+        return;
+      }
+
+      if (selectedRating === 0) {
+        alert('Please select a rating');
+        return;
+      }
+
+      const email = document.getElementById('rating-email').value.trim();
+      const comment = document.getElementById('rating-comment').value.trim();
+
+      if (!email || !comment) {
+        alert('Please fill in all fields');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/exercises/${currentExercise._id}/rating`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            rate: selectedRating,
+            email: email,
+            review: comment
+          })
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to submit rating');
+        }
+
+        const data = await res.json();
+        
+        // Save rating to localStorage
+        const ratings = JSON.parse(localStorage.getItem('ratings') || '[]');
+        ratings.push({
+          exerciseId: currentExercise._id,
+          exerciseName: currentExercise.name,
+          rating: selectedRating,
+          email: email,
+          comment: comment,
+          date: new Date().toISOString()
+        });
+        localStorage.setItem('ratings', JSON.stringify(ratings));
+
+        alert('Rating submitted successfully!');
+        closeRatingModal();
+        
+        if (selectedCategory) {
+          loadExercises();
+        }
+      } catch (err) {
+        console.error('Error submitting rating:', err);
+        alert('Failed to submit rating. Please try again.');
+      }
+    });
+  }
+
+  // === Pagination ===
+  function renderPagination(totalPages) {
+    pagination.innerHTML = '';
+    if (!totalPages || totalPages <= 1) return;
+
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'page-btn';
+      btn.textContent = i;
+      if (i === currentPage) btn.classList.add('active');
+
+      btn.addEventListener('click', () => {
+        currentPage = i;
+        if (selectedCategory) {
+          loadExercises();
+        } else {
+          const activeTab = document.querySelector('.tab-btn.active');
+          const filterName = activeTab ? activeTab.textContent.trim() : 'Body parts';
+          loadFilters(filterName);
+        }
+      });
+
+      pagination.appendChild(btn);
+    }
+  }
+
+  // === Tab handling ===
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+
+      const filterName = tab.getAttribute('data-filter') || tab.textContent.trim();
+      currentPage = 1;
+      selectedCategory = null;
+      searchQuery = '';
+      if (searchInput) searchInput.value = '';
+      if (categoryTitle) categoryTitle.textContent = '';
+      loadFilters(filterName);
+    });
+  });
+
+  // === Search functionality ===
+  if (searchBtn && searchInput) {
+    const performSearch = () => {
+      searchQuery = searchInput.value.trim();
+      if (selectedCategory) {
+        currentPage = 1;
+        loadExercises();
+      }
+    };
+
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        performSearch();
+      }
+    });
+  }
+
+  // === Subscription ===
   if (subscribeForm) {
     subscribeForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -173,7 +604,18 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // === INITIALIZATION ===
+  // === Initialization ===
   loadQuote();
-  renderFavorites();
+
+  if (categoryTitle) categoryTitle.textContent = '';
+
+  const defaultTab = Array.from(tabs).find(t => t.getAttribute('data-filter') === 'Body parts' || t.textContent.trim() === 'Body parts');
+  if (defaultTab) {
+    defaultTab.classList.add('active');
+    loadFilters('Body parts');
+  } else if (tabs.length > 0) {
+    tabs[0].classList.add('active');
+    const filterName = tabs[0].getAttribute('data-filter') || tabs[0].textContent.trim();
+    loadFilters(filterName);
+  }
 });
