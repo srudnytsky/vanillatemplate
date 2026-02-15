@@ -272,20 +272,13 @@
 }
 
 /* ================= RESPONSIVE ================= */
-@media (max-width: 1200px) {
-    .exercises .container {
-        grid-template-columns: 250px 1fr;
-    }
-    
-    .exercises-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
 
-@media (max-width: 992px) {
+/* Tablet (768px - 992px) */
+@media (max-width: 992px) and (min-width: 768px) {
+    /* Keep sidebar + grid layout but adjust */
     .exercises .container {
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto 1fr auto;
+        grid-template-rows: auto auto auto auto;
     }
     
     .exercises-header {
@@ -293,16 +286,22 @@
         grid-row: 1;
     }
     
-    .exercises-sidebar {
-        grid-column: 1;
-        grid-row: 2;
-        margin-bottom: 32px;
-    }
-    
+    /* Exercises grid full width */
     .exercises-grid {
         grid-column: 1;
+        grid-row: 2;
+        grid-template-columns: repeat(3, 1fr);
+        margin-bottom: 40px;
+    }
+    
+    /* Sidebar below exercises - 2 columns */
+    .exercises-sidebar {
+        grid-column: 1;
         grid-row: 3;
+        display: grid;
         grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-bottom: 40px;
     }
     
     .pagination {
@@ -311,14 +310,20 @@
     }
 }
 
+/* Mobile (<768px) */
 @media (max-width: 767px) {
     .container {
         padding: 0 20px;
     }
     
-    /* Exercises - мобильная версия */
+    /* Exercises section */
     .exercises {
         padding: 40px 0 60px;
+    }
+    
+    .exercises .container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto;
     }
     
     .exercises-header {
@@ -326,6 +331,8 @@
         align-items: flex-start;
         gap: 16px;
         margin-bottom: 32px;
+        grid-column: 1;
+        grid-row: 1;
     }
     
     .exercises-header h2 {
@@ -340,16 +347,34 @@
         font-size: 14px;
     }
     
+    /* Exercises grid - full width, 1 column */
     .exercises-grid {
+        grid-column: 1;
+        grid-row: 2;
         grid-template-columns: 1fr;
         gap: 16px;
+        margin-bottom: 32px;
     }
     
+    /* Sidebar below - vertical stack */
+    .exercises-sidebar {
+        grid-column: 1;
+        grid-row: 3;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+    
+    .pagination {
+        grid-column: 1;
+        grid-row: 4;
+    }
+    
+    /* Cards sizing */
     .quote-card,
-    .info-card,
-    .exercise-card {
-        height: auto;
-        min-height: 200px;
+    .info-card {
+        min-height: auto;
     }
     
     .quote-card {
@@ -371,12 +396,12 @@
     }
     
     .exercise-card {
-        height: 220px;
+        height: 240px;
     }
     
     .pagination {
         gap: 6px;
-        margin-top: 32px;
+        margin-top: 0;
     }
     
     .page-btn {
