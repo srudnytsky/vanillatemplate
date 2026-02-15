@@ -34,25 +34,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentExercise = null;
 
-  // === FAVORITES FUNCTIONS ===
+  // === FAVORITES FUNCTIONS с диагностикой ===
   function getFavorites() {
     try {
-      return JSON.parse(localStorage.getItem('favorites')) || [];
-    } catch {
+      // Пробуем получить из стандартного ключа
+      let favorites = localStorage.getItem('favorites');
+      
+      // Если нет, пробуем другие возможные ключи
+      if (!favorites) {
+        // Проверяем другие возможные ключи
+        const possibleKeys = ['favorites', 'fav', 'favouriteExercises', 'exerciseFavorites'];
+        for (let key of possibleKeys) {
+          const data = localStorage.getItem(key);
+          if (data) {
+            console.log('Найдены избранные в ключе:', key);
+            // Сохраняем в стандартный ключ для будущего использования
+            localStorage.setItem('favorites', data);
+            favorites = data;
+            break;
+          }
+        }
+      }
+      
+      // Пытаемся найти любые данные в localStorage, которые похожи на избранное
+      if (!favorites) {
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          const value = localStorage.getItem(key);
+          try {
+            const parsed = JSON.parse(value);
+            if (Array.isArray(parsed) && parsed.length > 0 && parsed[0]._id) {
+              console.log('Найден массив избранного в ключе:', key);
+              localStorage.setItem('favorites', value);
+              favorites = value;
+              break;
+            }
+          } catch (e) {
+            // Не JSON, пропускаем
+          }
+        }
+      }
+      
+      return favorites ? JSON.parse(favorites) : [];
+    } catch (error) {
+      console.error('Ошибка чтения избранного:', error);
       return [];
+    }
+  }
+
+  function saveFavorites(favorites) {
+    try {
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      console.log('Сохранено в localStorage:', favorites.length, 'элементов');
+    } catch (error) {
+      console.error('Ошибка сохранения:', error);
     }
   }
 
   function removeFromFavorites(exerciseId) {
     const favorites = getFavorites();
     const updatedFavorites = favorites.filter(fav => fav._id !== exerciseId);
-    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+    saveFavorites(updatedFavorites);
     displayFavorites(); // Перерисовываем список
   }
 
   // === ОТОБРАЖЕНИЕ ИЗБРАННОГО ===
   function displayFavorites() {
     const favorites = getFavorites();
+    
+    console.log('Отображаем избранное:', favorites.length, 'элементов'); // Для отладки
     
     if (!favoritesContent) return;
     
@@ -80,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
             WORKOUT ${rating.toFixed(1)} ⭐
           </div>
           <div class="exercise-info">
-            <h3>${ex.name}</h3>
+            <h3>${ex.name || 'Unnamed exercise'}</h3>
             <div class="exercise-details">
               <span><span class="label">Burned calories:</span> ${ex.burnedCalories || 0} / ${ex.time || 0} min</span>
               <span><span class="label">Body part:</span> ${ex.bodyPart || ''}</span>
@@ -130,8 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function openExerciseModal(exercise) {
     const modal = document.getElementById('exercise-modal');
     if (!modal) {
-      // Если модального окна нет на странице, создаем его
-      createModalAndOpen(exercise);
+      alert('Modal window not found');
       return;
     }
 
@@ -238,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (favoriteIndex > -1) {
         favorites.splice(favoriteIndex, 1);
-        localStorage.setItem('favorites', JSON.stringify(favorites));
+        saveFavorites(favorites);
         addFavoritesBtn.innerHTML = 'Add to favorites ♡';
         addFavoritesBtn.style.color = '#F4F4F4';
         addFavoritesBtn.style.borderColor = 'rgba(244, 244, 244, 0.2)';
@@ -246,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
         displayFavorites(); // Обновляем список избранного
       } else {
         favorites.push(currentExercise);
-        localStorage.setItem('favorites', JSON.stringify(favorites));
+        saveFavorites(favorites);
         addFavoritesBtn.innerHTML = 'Remove from favorites ♥';
         addFavoritesBtn.style.color = '#EEA10C';
         addFavoritesBtn.style.borderColor = '#EEA10C';
@@ -285,7 +334,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // === Диагностика localStorage ===
+  function debugLocalStorage() {
+    console.log('=== localStorage diagnostic ===');
+    console.log('localStorage length:', localStorage.length);
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      const value = localStorage.getItem(key);
+      console.log(`Key: ${key}, Value length: ${value?.length}`);
+      try {
+        const parsed = JSON.parse(value);
+        if (Array.isArray(parsed)) {
+          console.log(`  → Это массив с ${parsed.length} элементами`);
+        }
+      } catch (e) {
+        // Не JSON
+      }
+    }
+    console.log('===============================');
+  }
+
   // === Initialization ===
+  debugLocalStorage(); // Для отладки
   loadQuote();
   displayFavorites(); // Отображаем избранное при загрузке страницы
 });
