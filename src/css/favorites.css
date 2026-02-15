@@ -117,40 +117,29 @@
     margin-bottom: 0;
 }
 
-/* ================= EMPTY STATE ================= */
-.empty-state {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 100px 40px;
-    font-size: 14px;
-    line-height: 1.5;
-    color: #242424;
-    max-width: 500px;
-    margin: 0 auto;
-}
-
 /* ================= FAVORITE EXERCISE CARDS ================= */
-.favorite-exercise-card {
+.exercise-card-horizontal {
     background: #FFFFFF;
     border-radius: 12px;
     padding: 16px;
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
     gap: 12px;
     transition: transform 0.3s;
+    cursor: pointer;
 }
 
-.favorite-exercise-card:hover {
+.exercise-card-horizontal:hover {
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.favorite-card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+.exercise-card-left {
+    flex: 1;
 }
 
-.favorite-workout-badge {
+.workout-badge {
     display: inline-flex;
     align-items: center;
     padding: 4px 12px;
@@ -162,101 +151,67 @@
     color: #242424;
     text-transform: uppercase;
     letter-spacing: 0.02em;
+    margin-bottom: 8px;
 }
 
-.favorite-delete-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
+.exercise-info h3 {
     font-size: 18px;
-    color: rgba(36, 36, 36, 0.4);
-    transition: var(--transition);
-}
-
-.favorite-delete-btn:hover {
+    font-weight: 600;
     color: #242424;
+    margin: 0 0 8px 0;
 }
 
-.favorite-exercise-info {
+.exercise-details {
     display: flex;
-    align-items: flex-start;
-    gap: 12px;
-}
-
-.favorite-exercise-icon {
-    width: 32px;
-    height: 32px;
-    background: #242424;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
-    color: #F4F4F4;
-}
-
-.favorite-exercise-name {
-    font-size: 20px;
-    font-weight: 400;
-    color: #242424;
-    margin: 0;
-    line-height: 1.2;
-    flex: 1;
-}
-
-.favorite-exercise-details {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    flex-wrap: wrap;
+    gap: 16px;
     font-size: 12px;
-    color: rgba(36, 36, 36, 0.5);
+    color: rgba(36, 36, 36, 0.6);
 }
 
-.favorite-exercise-details span {
-    display: flex;
-    align-items: center;
+.exercise-details span .label {
+    color: rgba(36, 36, 36, 0.4);
+    margin-right: 4px;
 }
 
-.favorite-exercise-details .label {
-    font-weight: 400;
-}
-
-.favorite-exercise-details .value {
-    color: #242424;
-    font-weight: 400;
-    margin-left: 4px;
-}
-
-.favorite-card-footer {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: auto;
-}
-
-.favorite-start-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 20px;
+.remove-favorite-btn {
     background: transparent;
-    border: none;
+    border: 1px solid rgba(36, 36, 36, 0.2);
+    border-radius: 30px;
     color: #242424;
-    font-size: 14px;
-    font-weight: 400;
+    padding: 8px 16px;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s;
+    font-size: 14px;
     font-family: 'DM Sans', sans-serif;
 }
 
-.favorite-start-btn:hover {
-    opacity: 0.7;
+.remove-favorite-btn:hover {
+    border-color: #EEA10C;
+    color: #EEA10C;
 }
 
-.favorite-start-btn svg {
-    width: 16px;
-    height: 16px;
+/* ================= EMPTY STATE ================= */
+.no-favorites {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 100px 40px;
+    background: #FFFFFF;
+    border-radius: 20px;
+    color: rgba(36, 36, 36, 0.6);
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 100%;
+    margin: 0;
+}
+
+.no-favorites a {
+    color: #EEA10C;
+    text-decoration: none;
+}
+
+.no-favorites a:hover {
+    text-decoration: underline;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -322,7 +277,17 @@
         font-size: 36px;
     }
     
-    .empty-state {
+    .exercise-card-horizontal {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .exercise-details {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .no-favorites {
         padding: 60px 20px;
     }
 }
