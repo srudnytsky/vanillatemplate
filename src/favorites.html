@@ -150,7 +150,112 @@
       </div>
     </div>
   </footer>
+
+  <!-- Модальные окна (добавлены из index.html) -->
+  <!-- Exercise Modal -->
+  <div class="exercise-modal" id="exercise-modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close">×</button>
+      
+      <div class="modal-body">
+        <div class="modal-image">
+          <img src="" alt="Exercise" id="modal-exercise-img" />
+        </div>
+        
+        <div class="modal-info">
+          <h2 id="modal-exercise-name">Air bake</h2>
+          
+          <div class="modal-rating">
+            <span class="rating-stars" id="modal-rating-stars">4.0 ⭐⭐⭐⭐☆</span>
+          </div>
+          
+          <div class="modal-stats">
+            <div class="modal-stat">
+              <span class="stat-label">Target</span>
+              <span class="stat-value" id="modal-target">Abs</span>
+            </div>
+            <div class="modal-stat">
+              <span class="stat-label">Body part</span>
+              <span class="stat-value" id="modal-body-part">Waist</span>
+            </div>
+            <div class="modal-stat">
+              <span class="stat-label">Equipment</span>
+              <span class="stat-value" id="modal-equipment">Body weight</span>
+            </div>
+            <div class="modal-stat">
+              <span class="stat-label">Popular</span>
+              <span class="stat-value" id="modal-popularity">150</span>
+            </div>
+            <div class="modal-stat">
+              <span class="stat-label">Burned calories</span>
+              <span class="stat-value" id="modal-calories">325/3 min</span>
+            </div>
+          </div>
+          
+          <div class="modal-description">
+            <p id="modal-description-text">
+              This refers to your core muscles, which include the rectus abdominus, obliques, and transversus abdominus. They're essential for maintaining posture, supporting your lower back in many movements.
+            </p>
+          </div>
+          
+          <div class="modal-actions">
+            <button class="modal-btn modal-btn-favorites" id="modal-add-favorites">
+              Add to favorites ♡
+            </button>
+            <button class="modal-btn modal-btn-rating" id="modal-give-rating">
+              Give a rating
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating Modal -->
+  <div class="rating-modal" id="rating-modal">
+    <div class="modal-overlay"></div>
+    <div class="rating-modal-content">
+      <button class="modal-close" id="rating-modal-close">×</button>
+      
+      <div class="rating-modal-body">
+        <h3 class="rating-title">Rating</h3>
+        
+        <div class="rating-stars-input">
+          <span class="star-input" data-rating="0.5">☆</span>
+          <span class="star-input" data-rating="1">☆</span>
+          <span class="star-input" data-rating="1.5">☆</span>
+          <span class="star-input" data-rating="2">☆</span>
+          <span class="star-input" data-rating="2.5">☆</span>
+          <span class="star-input" data-rating="3">☆</span>
+          <span class="star-input" data-rating="3.5">☆</span>
+          <span class="star-input" data-rating="4">☆</span>
+          <span class="star-input" data-rating="4.5">☆</span>
+          <span class="star-input" data-rating="5">☆</span>
+        </div>
+        
+        <div class="rating-current">0.0</div>
+        
+        <form class="rating-form" id="rating-form">
+          <input 
+            type="email" 
+            id="rating-email" 
+            placeholder="Email" 
+            required 
+          />
+          <textarea 
+            id="rating-comment" 
+            placeholder="Your comment" 
+            rows="4"
+            required
+          ></textarea>
+          <button type="submit" class="rating-submit-btn">Send</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Подключаем скрипты -->
   <script type="module" src="/js/favorites.js"></script>
- 
 </body>
 </html>
