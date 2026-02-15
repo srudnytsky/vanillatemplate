@@ -1,231 +1,180 @@
-// Favorites Page JavaScript
-// Manages favorite exercises using localStorage
-
-/**
- * Get favorites from localStorage
- * @returns {Array} Array of favorite exercises
- */
-function getFavorites() {
-  try {
-    const stored = localStorage.getItem('favorites');
-    return stored ? JSON.parse(stored) : [];
-  } catch (e) {
-    console.error('Error loading favorites from localStorage:', e);
-    return [];
-  }
-}
-
-/**
- * Save favorites to localStorage
- * @param {Array} favorites - Array of favorite exercises
- */
-function saveFavorites(favorites) {
-  try {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-  } catch (e) {
-    console.error('Error saving favorites to localStorage:', e);
-  }
-}
-
-/**
- * Create HTML for an exercise card
- * @param {Object} exercise - Exercise data
- * @returns {string} HTML string
- */
-function createExerciseCard(exercise) {
-  // Calculate time and calories display
-  const time = exercise.time || 3;
-  const calories = exercise.burnedCalories || 0;
+document.addEventListener('DOMContentLoaded', () => {
+  // === MOBILE MENU ===
+  const menuToggle = document.querySelector('.menu-toggle');
+  const mobileMenu = document.querySelector('.mobile-menu');
+  const menuClose = document.querySelector('.mobile-menu-close');
   
-  return `
-    <div class="exercise-card" data-id="${exercise._id || exercise.id}">
-      <div class="exercise-card-header">
-        <span class="workout-badge">WORKOUT</span>
-        <button class="delete-btn" aria-label="Remove from favorites" data-id="${exercise._id || exercise.id}">
-          <i class="far fa-trash-alt"></i>
-        </button>
-      </div>
-      
-      <div class="exercise-info">
-        <div class="exercise-icon">
-          <i class="fas fa-bolt"></i>
-        </div>
-        <h3 class="exercise-name">${exercise.name}</h3>
-      </div>
-      
-      <div class="exercise-meta">
-        <span>Burned calories: <strong>${calories} / ${time} min</strong></span>
-        <span>Body part: <strong>${exercise.bodyPart || 'N/A'}</strong></span>
-        <span>Target: <strong>${exercise.target || 'N/A'}</strong></span>
-      </div>
-      
-      <div class="exercise-footer">
-        <button class="start-btn" data-id="${exercise._id || exercise.id}">
-          Start
-          <i class="fas fa-arrow-right"></i>
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-/**
- * Render favorites on the page
- */
-function renderFavorites() {
-  const container = document.getElementById('favorites-container');
-  const emptyState = document.getElementById('empty-state');
-  
-  if (!container || !emptyState) {
-    console.error('Required DOM elements not found');
-    return;
-  }
-  
-  // Get favorites from localStorage
-  const favorites = getFavorites();
-  
-  // Clear existing cards (except empty state)
-  Array.from(container.children).forEach(child => {
-    if (!child.classList.contains('empty-state')) {
-      child.remove();
-    }
-  });
-  
-  // Show/hide empty state based on favorites
-  if (favorites.length === 0) {
-    emptyState.style.display = 'block';
-  } else {
-    emptyState.style.display = 'none';
-    
-    // Render exercise cards
-    favorites.forEach(exercise => {
-      container.insertAdjacentHTML('beforeend', createExerciseCard(exercise));
+  if (menuToggle && mobileMenu && menuClose) {
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.add('active');
+      document.body.style.overflow = 'hidden';
     });
     
-    // Add event listeners to delete buttons
-    container.querySelectorAll('.delete-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const exerciseId = btn.getAttribute('data-id');
-        removeFromFavorites(exerciseId);
-      });
+    menuClose.addEventListener('click', () => {
+      mobileMenu.classList.remove('active');
+      document.body.style.overflow = '';
     });
     
-    // Add event listeners to start buttons
-    container.querySelectorAll('.start-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const exerciseId = btn.getAttribute('data-id');
-        startExercise(exerciseId);
+    mobileMenu.querySelectorAll('.mobile-menu-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('active');
+        document.body.style.overflow = '';
       });
     });
   }
-}
 
-/**
- * Remove exercise from favorites
- * @param {string} exerciseId - ID of exercise to remove
- */
-function removeFromFavorites(exerciseId) {
-  let favorites = getFavorites();
-  favorites = favorites.filter(ex => (ex._id || ex.id) !== exerciseId);
-  saveFavorites(favorites);
-  renderFavorites();
-}
-
-/**
- * Start exercise (navigate to exercise page or modal)
- * @param {string} exerciseId - ID of exercise to start
- */
-function startExercise(exerciseId) {
-  console.log('Starting exercise:', exerciseId);
-  // Navigate to exercise detail page or open modal
-  // Example: window.location.href = `exercise.html?id=${exerciseId}`;
-}
-
-/**
- * Add exercise to favorites (to be called from other pages)
- * @param {Object} exercise - Exercise object to add
- */
-function addToFavorites(exercise) {
-  const favorites = getFavorites();
-  const exerciseId = exercise._id || exercise.id;
-  
-  // Check if already in favorites
-  const exists = favorites.some(ex => (ex._id || ex.id) === exerciseId);
-  
-  if (!exists) {
-    favorites.push(exercise);
-    saveFavorites(favorites);
-    return true;
-  }
-  
-  return false;
-}
-
-/**
- * Check if exercise is in favorites
- * @param {string} exerciseId - ID of exercise to check
- * @returns {boolean}
- */
-function isInFavorites(exerciseId) {
-  const favorites = getFavorites();
-  return favorites.some(ex => (ex._id || ex.id) === exerciseId);
-}
-
-/**
- * Initialize page
- */
-function initFavoritesPage() {
-  // Render favorites
-  renderFavorites();
-  
-  // Handle subscribe form
+  // === API AND STORAGE ===
+  const API_BASE = 'https://your-energy.b.goit.study/api';
+  const favoritesContent = document.getElementById('favorites-content');
+  const quoteText = document.getElementById('fav-quote-text');
+  const quoteAuthor = document.getElementById('fav-quote-author');
   const subscribeForm = document.getElementById('subscribe-form');
+
+  // === FAVORITES MANAGEMENT ===
+  function getFavorites() {
+    const favorites = localStorage.getItem('favorites');
+    return favorites ? JSON.parse(favorites) : [];
+  }
+
+  function saveFavorites(favorites) {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  }
+
+  function removeFavorite(exerciseId) {
+    let favorites = getFavorites();
+    favorites = favorites.filter(fav => fav._id !== exerciseId);
+    saveFavorites(favorites);
+    renderFavorites();
+  }
+
+  // === RENDER FAVORITES ===
+  function renderFavorites() {
+    if (!favoritesContent) return;
+
+    const favorites = getFavorites();
+
+    if (favorites.length === 0) {
+      // Show empty state
+      favoritesContent.innerHTML = `
+        <div class="empty-state">
+          It appears that you haven't added any exercises to your favorites yet. To get started, you can add exercises that you like to your favorites for easier access in the future.
+        </div>
+      `;
+      return;
+    }
+
+    // Render exercise cards
+    favoritesContent.innerHTML = '';
+    
+    favorites.forEach(exercise => {
+      const card = document.createElement('div');
+      card.className = 'favorite-exercise-card';
+      
+      card.innerHTML = `
+        <div class="favorite-card-header">
+          <span class="favorite-workout-badge">WORKOUT</span>
+          <button class="favorite-delete-btn" data-id="${exercise._id}" aria-label="Remove from favorites">
+            🗑
+          </button>
+        </div>
+        
+        <div class="favorite-exercise-info">
+          <div class="favorite-exercise-icon">⚡</div>
+          <h3 class="favorite-exercise-name">${exercise.name}</h3>
+        </div>
+        
+        <div class="favorite-exercise-details">
+          <span><span class="label">Burned calories:</span> <span class="value">${exercise.burnedCalories || 0} / ${exercise.time || 0} min</span></span>
+          <span><span class="label">Body part:</span> <span class="value">${exercise.bodyPart || ''}</span></span>
+          <span><span class="label">Target:</span> <span class="value">${exercise.target || ''}</span></span>
+        </div>
+        
+        <div class="favorite-card-footer">
+          <button class="favorite-start-btn" data-id="${exercise._id}">
+            Start
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M12.172 7L6.808 1.636L8.222 0.222L16 8L8.222 15.778L6.808 14.364L12.172 9H0V7H12.172Z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+      `;
+
+      favoritesContent.appendChild(card);
+    });
+
+    // Add event listeners to delete buttons
+    document.querySelectorAll('.favorite-delete-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const exerciseId = btn.getAttribute('data-id');
+        if (confirm('Remove this exercise from favorites?')) {
+          removeFavorite(exerciseId);
+        }
+      });
+    });
+
+    // Add event listeners to start buttons
+    document.querySelectorAll('.favorite-start-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const exerciseId = btn.getAttribute('data-id');
+        const exercise = favorites.find(fav => fav._id === exerciseId);
+        if (exercise) {
+          // Navigate to index page or open modal
+          window.location.href = `index.html`;
+        }
+      });
+    });
+  }
+
+  // === LOAD DAILY QUOTE ===
+  async function loadQuote() {
+    try {
+      const res = await fetch(`${API_BASE}/quote`);
+      if (!res.ok) throw new Error('Network error');
+      const data = await res.json();
+      if (data?.quote && data?.author) {
+        if (quoteText) quoteText.textContent = data.quote;
+        if (quoteAuthor) quoteAuthor.textContent = data.author;
+      } else {
+        if (quoteText) quoteText.textContent = "Quote not available";
+        if (quoteAuthor) quoteAuthor.textContent = "";
+      }
+    } catch (err) {
+      console.error('Error loading quote:', err);
+      if (quoteText) quoteText.textContent = "A lot of times I find that people who are blessed with the most talent don't ever develop that attitude, and the ones who aren't blessed in that way are the most competitive and have the biggest heart.";
+      if (quoteAuthor) quoteAuthor.textContent = "Tom Brady";
+    }
+  }
+
+  // === SUBSCRIPTION ===
   if (subscribeForm) {
-    subscribeForm.addEventListener('submit', (e) => {
+    subscribeForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const emailInput = subscribeForm.querySelector('input[type="email"]');
-      const email = emailInput.value;
-      
-      if (email) {
-        console.log('Subscribe:', email);
-        // Add your subscription logic here
-        alert('Thank you for subscribing!');
+      const email = emailInput?.value.trim();
+
+      if (!email) {
+        alert('Please enter your email');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/subscription`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await res.json();
+        alert(data.message || 'Successfully subscribed!');
         subscribeForm.reset();
+      } catch (err) {
+        console.error('Subscription error:', err);
+        alert('Failed to subscribe. Please try again later.');
       }
     });
   }
-  
-  // Mobile menu toggle
-  const menuToggle = document.querySelector('.menu-toggle');
-  const mobileMenu = document.querySelector('.mobile-menu');
-  const mobileMenuClose = document.querySelector('.mobile-menu-close');
-  
-  if (menuToggle && mobileMenu) {
-    menuToggle.addEventListener('click', () => {
-      mobileMenu.classList.add('active');
-    });
-  }
-  
-  if (mobileMenuClose && mobileMenu) {
-    mobileMenuClose.addEventListener('click', () => {
-      mobileMenu.classList.remove('active');
-    });
-  }
-}
 
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', initFavoritesPage);
-
-// Export functions for use in other scripts
-if (typeof window !== 'undefined') {
-  window.favoritesManager = {
-    getFavorites,
-    saveFavorites,
-    addToFavorites,
-    removeFromFavorites,
-    isInFavorites,
-    renderFavorites
-  };
-}
+  // === INITIALIZATION ===
+  loadQuote();
+  renderFavorites();
+});
