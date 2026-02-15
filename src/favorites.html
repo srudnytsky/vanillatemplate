@@ -7,28 +7,28 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
   <link rel="stylesheet" href="css/base.css" />
-  <link rel="stylesheet" href="css/favorites.css" />
-    <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="сss/favorites.css" />
+  <link rel="stylesheet" href="css/layout.css" />
 </head>
 <body>
-   <!-- Header -->
+  <!-- Header -->
   <header class="header">
     <div class="container">
       <div class="logo">
         <img src="img/logo.png" alt="YOUR ENERGY" />
       </div>
       
-      <!-- Бургер-меню ТОЛЬКО для мобильных -->
+      <!-- Burger menu for mobile -->
       <button class="menu-toggle" aria-label="Open menu">
         <span></span>
         <span></span>
         <span></span>
       </button>
 
-  <div class="nav-pills">
-  <a href="index.html" class="nav-pill">Home</a>
-  <a href="favorites.html" class="nav-pill active">Favorites</a>
-</div>
+      <div class="nav-pills">
+        <a href="index.html" class="nav-pill">Home</a>
+        <a href="favorites.html" class="nav-pill active">Favorites</a>
+      </div>
 
       <div class="social-header">
         <a href="#" aria-label="Facebook">
@@ -49,25 +49,26 @@
       </div>
     </div>
 
-    <!-- Модальное меню ТОЛЬКО для мобильных -->
+    <!-- Mobile menu -->
     <div class="mobile-menu">
       <button class="mobile-menu-close">×</button>
       <div class="mobile-menu-links">
-        <a href="#" class="mobile-menu-link">Home</a>
-        <a href="#" class="mobile-menu-link">Favorites</a>
+        <a href="index.html" class="mobile-menu-link">Home</a>
+        <a href="favorites.html" class="mobile-menu-link">Favorites</a>
       </div>
     </div>
   </header>
-  <!-- Хедер из base.css -->
+
+  <!-- Main Content -->
   <main class="favorites-page">
     <div class="container">
       <h1 class="page-title">Favorites</h1>
 
-      <!-- Основной макет: левая колонка (цитата + норма) + правая (упражнения) -->
+      <!-- Main Layout: Left column (quote + norm) + Right column (exercises) -->
       <div class="favorites-layout">
-        <!-- ЛЕВАЯ КОЛОНКА: вертикальный стек -->
+        <!-- LEFT COLUMN -->
         <div class="left-column">
-          <!-- Цитата дня — черная карточка -->
+          <!-- Quote Card -->
           <div class="quote-card card">
             <div class="quote-icon">
               <i class="fas fa-running"></i>
@@ -76,10 +77,10 @@
             <p class="quote-text">
               A lot of times I find that people who are blessed with the most talent don't ever develop that attitude, and the ones who aren't blessed in that way are the most competitive and have the biggest heart.
             </p>
-            <p class="quote-author">— Tom Brady</p>
+            <p class="quote-author">Tom Brady</p>
           </div>
 
-          <!-- Норма спорта — белая карточка, ниже цитаты -->
+          <!-- Norm Card -->
           <div class="norm-card card">
             <div class="norm-icon">
               <i class="fas fa-fire"></i>
@@ -92,20 +93,50 @@
           </div>
         </div>
 
-        <!-- ПРАВАЯ КОЛОНКА: упражнения или пустое состояние -->
+        <!-- RIGHT COLUMN: Exercises -->
         <div class="favorites-container" id="favorites-container">
-          <!-- Пустое состояние — показывается, если нет данных:
-               должно быть на том же уровне, что и quote-card (top: 250px от container) -->
+          <!-- Empty State - shown when no favorites -->
           <div class="empty-state" id="empty-state">
-            It appears that you haven’t added any exercises to your favorites yet. To get started, you can add exercises that you like to your favorites for easier access in the future.
+            It appears that you haven't added any exercises to your favorites yet. To get started, you can add exercises that you like to your favorites for easier access in the future.
           </div>
- 
+
+          <!-- Example Exercise Cards (to be generated dynamically) -->
+          <!-- 
+          <div class="exercise-card">
+            <div class="exercise-card-header">
+              <span class="workout-badge">WORKOUT</span>
+              <button class="delete-btn" aria-label="Remove from favorites">
+                <i class="far fa-trash-alt"></i>
+              </button>
+            </div>
+            
+            <div class="exercise-info">
+              <div class="exercise-icon">
+                <i class="fas fa-bolt"></i>
+              </div>
+              <h3 class="exercise-name">Air bike</h3>
+            </div>
+            
+            <div class="exercise-meta">
+              <span>Burned calories: <strong>312 / 3 min</strong></span>
+              <span>Body part: <strong>Waist</strong></span>
+              <span>Target: <strong>Abs</strong></span>
+            </div>
+            
+            <div class="exercise-footer">
+              <button class="start-btn">
+                Start
+                <i class="fas fa-arrow-right"></i>
+              </button>
+            </div>
+          </div>
+          -->
         </div>
       </div>
     </div>
   </main>
 
- <!-- Footer -->
+  <!-- Footer -->
   <footer class="footer">
     <div class="container">
       <div class="footer-grid">

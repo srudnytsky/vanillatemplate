@@ -1,254 +1,231 @@
-// === Константы ===
-const API_BASE_URL = 'https://your-energy.b.goit.study/api';
-const FAVORITES_KEY = 'favorites';
+// Favorites Page JavaScript
+// Manages favorite exercises using localStorage
 
-// === DOM элементы ===
-const container = document.querySelector('.container');
-
-// === Функция: получить цитату дня ===
-async function fetchDailyQuote() {
-    try {
-        const res = await fetch(`${API_BASE_URL}/quote`);
-        if (!res.ok) throw new Error('Failed to fetch quote');
-        const data = await res.json();
-        // Обновляем текст цитаты на странице
-        const quoteText = document.querySelector('.quote-text');
-        const quoteAuthor = document.querySelector('.quote-author');
-        if (quoteText) quoteText.textContent = data.quote || 'Stay strong. Every rep counts.';
-        if (quoteAuthor) quoteAuthor.textContent = data.author ? `— ${data.author}` : '— Tom Brady';
-    } catch (err) {
-        console.warn('Using fallback quote:', err);
-    }
-}
-
-// === Функция: получить упражнение по ID ===
-async function fetchExercise(id) {
-    try {
-        const res = await fetch(`${API_BASE_URL}/exercises/${id}`);
-        if (!res.ok) throw new Error(`Exercise ${id} not found`);
-        return await res.json();
-    } catch {
-        return null;
-    }
-}
-
-// === Управление избранным ===
+/**
+ * Get favorites from localStorage
+ * @returns {Array} Array of favorite exercises
+ */
 function getFavorites() {
-    const stored = localStorage.getItem(FAVORITES_KEY);
+  try {
+    const stored = localStorage.getItem('favorites');
     return stored ? JSON.parse(stored) : [];
+  } catch (e) {
+    console.error('Error loading favorites from localStorage:', e);
+    return [];
+  }
 }
 
-function saveFavorites(favs) {
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
+/**
+ * Save favorites to localStorage
+ * @param {Array} favorites - Array of favorite exercises
+ */
+function saveFavorites(favorites) {
+  try {
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+  } catch (e) {
+    console.error('Error saving favorites to localStorage:', e);
+  }
 }
 
-function removeFavorite(id) {
-    const favs = getFavorites().filter(x => x !== id);
-    saveFavorites(favs);
-    renderPage(); // Перерисовать всю страницу
-}
-
-// === Создание карточки упражнения ===
-function createExerciseCard(ex) {
-    if (!ex) return null;
-
-    const card = document.createElement('div');
-    card.className = 'exercise-card';
-
-    const duration = ex.time || 3;
-    const caloriesText = `${ex.calories} / ${duration} min`;
-
-    card.innerHTML = `
-        <div class="card-header">
-            <div class="workout-tag">WORKOUT</div>
-            <button class="remove-btn" data-id="${ex.id}">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
-        <h3 class="exercise-title">${ex.name}</h3>
-        <div class="exercise-info">
-            <div class="info-item">
-                <i class="fas fa-fire"></i>
-                <span class="info-value">Burned calories: ${caloriesText}</span>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-user"></i>
-                <span class="info-value">Body part: ${ex.bodyPart}</span>
-            </div>
-            <div class="info-item">
-                <i class="fas fa-bullseye"></i>
-                <span class="info-value">Target: ${ex.target}</span>
-            </div>
-        </div>
-        <div class="rating">
-            <span>${ex.rating || 4.5}</span>
-            <i class="fas fa-star"></i>
-        </div>
-        <div class="badge">
-            <span>WORKOUT</span>
-        </div>
-        <button class="start-btn">
-            <span>Start</span>
-            <i class="fas fa-arrow-right"></i>
+/**
+ * Create HTML for an exercise card
+ * @param {Object} exercise - Exercise data
+ * @returns {string} HTML string
+ */
+function createExerciseCard(exercise) {
+  // Calculate time and calories display
+  const time = exercise.time || 3;
+  const calories = exercise.burnedCalories || 0;
+  
+  return `
+    <div class="exercise-card" data-id="${exercise._id || exercise.id}">
+      <div class="exercise-card-header">
+        <span class="workout-badge">WORKOUT</span>
+        <button class="delete-btn" aria-label="Remove from favorites" data-id="${exercise._id || exercise.id}">
+          <i class="far fa-trash-alt"></i>
         </button>
-    `;
-
-    card.querySelector('.remove-btn')?.addEventListener('click', () => {
-        removeFavorite(ex.id);
-    });
-
-    return card;
+      </div>
+      
+      <div class="exercise-info">
+        <div class="exercise-icon">
+          <i class="fas fa-bolt"></i>
+        </div>
+        <h3 class="exercise-name">${exercise.name}</h3>
+      </div>
+      
+      <div class="exercise-meta">
+        <span>Burned calories: <strong>${calories} / ${time} min</strong></span>
+        <span>Body part: <strong>${exercise.bodyPart || 'N/A'}</strong></span>
+        <span>Target: <strong>${exercise.target || 'N/A'}</strong></span>
+      </div>
+      
+      <div class="exercise-footer">
+        <button class="start-btn" data-id="${exercise._id || exercise.id}">
+          Start
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  `;
 }
 
-// === Рендер пустого состояния (как в макете) ===
-function renderEmptyState() {
-    document.querySelector('.main-content').innerHTML = `
-        <h1 class="page-title">Favorites</h1>
-
-        <!-- Quote block -->
-        <section class="quote-section empty">
-            <div class="quote-card empty" style="width: 494px; height: 230px; background: #242424; border-radius: 20px; padding: 40px; position: relative;">
-                <div class="quote-icon" style="position: absolute; top: 40px; left: 40px; width: 34px; height: 32px;">
-                    <i class="fas fa-running" style="color: #F4F4F4;"></i>
-                </div>
-                <h3 class="quote-title" style="font-weight: 500; font-size: 24px; line-height: 32px; margin-bottom: 16px; color: #F4F4F4;">Quote of the day</h3>
-                <p class="quote-text" style="font-size: 14px; line-height: 18px; color: rgba(244,244,244,0.6); margin-bottom: 16px;">
-                    A lot of times I find that people who are blessed with the most talent don't ever develop that attitude, and the ones who aren't blessed in that way are the most competitive and have the biggest heart.
-                </p>
-                <p class="quote-author" style="font-size: 16px; line-height: 24px; color: #F4F4F4;">Tom Brady</p>
-            </div>
-        </section>
-
-        <!-- Daily norm block -->
-        <section class="daily-norm empty" style="position: absolute; left: 32px; top: 496px; width: 239px; height: 141px;">
-            <div class="norm-card empty" style="background: #FFFFFF; border-radius: 20px; padding: 25px; display: flex; align-items: center; gap: 32px;">
-                <div class="norm-icon" style="width: 20px; height: 20px; position: relative;">
-                    <div style="width: 20px; height: 20px; background: #242424; border-radius: 50%;"></div>
-                </div>
-                <div class="norm-content">
-                    <h3 class="norm-title" style="font-weight: 500; font-size: 24px; line-height: 32px; color: #242424;">110 min</h3>
-                    <p class="norm-subtitle" style="font-size: 14px; line-height: 18px; color: rgba(36,36,36,0.6);">Daily norm of sports</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Empty text -->
-        <div style="
-            position: absolute;
-            width: 554px;
-            height: 72px;
-            left: 706px;
-            top: 364px;
-            font-family: 'DM Sans';
-            font-weight: 400;
-            font-size: 18px;
-            line-height: 24px;
-            text-align: center;
-            color: #242424;
-        ">
-            It appears that you haven't added any exercises to your favorites yet. To get started, you can add exercises that you like to your favorites for easier access in the future.
-        </div>
-    `;
+/**
+ * Render favorites on the page
+ */
+function renderFavorites() {
+  const container = document.getElementById('favorites-container');
+  const emptyState = document.getElementById('empty-state');
+  
+  if (!container || !emptyState) {
+    console.error('Required DOM elements not found');
+    return;
+  }
+  
+  // Get favorites from localStorage
+  const favorites = getFavorites();
+  
+  // Clear existing cards (except empty state)
+  Array.from(container.children).forEach(child => {
+    if (!child.classList.contains('empty-state')) {
+      child.remove();
+    }
+  });
+  
+  // Show/hide empty state based on favorites
+  if (favorites.length === 0) {
+    emptyState.style.display = 'block';
+  } else {
+    emptyState.style.display = 'none';
     
-    // Загрузить актуальную цитату
-    fetchDailyQuote();
-}
-
-// === Рендер основного состояния (с упражнениями) ===
-async function renderWithExercises() {
-    const favoriteIds = getFavorites();
-    const exercises = await Promise.all(favoriteIds.map(id => fetchExercise(id)));
-    const validExercises = exercises.filter(ex => ex !== null);
-
-    document.querySelector('.main-content').innerHTML = `
-        <h1 class="page-title">Favorites</h1>
-        <div class="left-column">
-            <div class="quote-card">
-                <div class="quote-icon"><i class="fas fa-running"></i></div>
-                <h3 class="quote-title">Quote of the day</h3>
-                <p class="quote-text">Loading...</p>
-                <p class="quote-author">—</p>
-            </div>
-            <div class="norm-card">
-                <div class="norm-icon"><i class="fas fa-fire"></i></div>
-                <div class="norm-content">
-                    <h3 class="norm-title">110 min</h3>
-                    <p class="norm-subtitle">Daily norm of sports</p>
-                </div>
-                <div class="norm-image" style="background-image: url('https://your-energy.b.goit.study/images/young-women-doing-fitness-outdoors-together.jpg');"></div>
-            </div>
-        </div>
-        <div class="right-column">
-            <div class="favorites-grid" id="favorites-grid"></div>
-        </div>
-    `;
-
-    // Загрузить цитату
-    fetchDailyQuote();
-
-    // Вставить карточки
-    const grid = document.getElementById('favorites-grid');
-    validExercises.forEach(ex => {
-        const card = createExerciseCard(ex);
-        if (card) grid.appendChild(card);
+    // Render exercise cards
+    favorites.forEach(exercise => {
+      container.insertAdjacentHTML('beforeend', createExerciseCard(exercise));
     });
-}
-
-// === Основная функция рендера ===
-async function renderPage() {
-    const favorites = getFavorites();
-    if (favorites.length === 0) {
-        renderEmptyState();
-    } else {
-        await renderWithExercises();
-    }
-}
-
-// === Подписка на рассылку ===
-async function handleSubscription(e) {
-    e.preventDefault();
-    const emailInput = document.querySelector('.footer-email');
-    const email = emailInput?.value.trim();
-
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        alert('Please enter a valid email address.');
-        return;
-    }
-
-    try {
-        const res = await fetch(`${API_BASE_URL}/subscription`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
-        });
-
-        if (res.ok) {
-            alert('Thank you for subscribing!');
-            emailInput.value = '';
-        } else {
-            alert('Failed to subscribe. Please try again.');
-        }
-    } catch {
-        alert('Network error. Please check your connection.');
-    }
-}
-
-// === Инициализация ===
-document.addEventListener('DOMContentLoaded', () => {
-    // Настроить подписку
-    const subscribeBtn = document.querySelector('.footer-btn');
-    if (subscribeBtn) {
-        subscribeBtn.addEventListener('click', handleSubscription);
-    }
-
-    // Навигация по табам
-    document.querySelectorAll('.nav-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-        });
+    
+    // Add event listeners to delete buttons
+    container.querySelectorAll('.delete-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const exerciseId = btn.getAttribute('data-id');
+        removeFromFavorites(exerciseId);
+      });
     });
+    
+    // Add event listeners to start buttons
+    container.querySelectorAll('.start-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const exerciseId = btn.getAttribute('data-id');
+        startExercise(exerciseId);
+      });
+    });
+  }
+}
 
-    // Отобразить страницу
-    renderPage();
-});
+/**
+ * Remove exercise from favorites
+ * @param {string} exerciseId - ID of exercise to remove
+ */
+function removeFromFavorites(exerciseId) {
+  let favorites = getFavorites();
+  favorites = favorites.filter(ex => (ex._id || ex.id) !== exerciseId);
+  saveFavorites(favorites);
+  renderFavorites();
+}
+
+/**
+ * Start exercise (navigate to exercise page or modal)
+ * @param {string} exerciseId - ID of exercise to start
+ */
+function startExercise(exerciseId) {
+  console.log('Starting exercise:', exerciseId);
+  // Navigate to exercise detail page or open modal
+  // Example: window.location.href = `exercise.html?id=${exerciseId}`;
+}
+
+/**
+ * Add exercise to favorites (to be called from other pages)
+ * @param {Object} exercise - Exercise object to add
+ */
+function addToFavorites(exercise) {
+  const favorites = getFavorites();
+  const exerciseId = exercise._id || exercise.id;
+  
+  // Check if already in favorites
+  const exists = favorites.some(ex => (ex._id || ex.id) === exerciseId);
+  
+  if (!exists) {
+    favorites.push(exercise);
+    saveFavorites(favorites);
+    return true;
+  }
+  
+  return false;
+}
+
+/**
+ * Check if exercise is in favorites
+ * @param {string} exerciseId - ID of exercise to check
+ * @returns {boolean}
+ */
+function isInFavorites(exerciseId) {
+  const favorites = getFavorites();
+  return favorites.some(ex => (ex._id || ex.id) === exerciseId);
+}
+
+/**
+ * Initialize page
+ */
+function initFavoritesPage() {
+  // Render favorites
+  renderFavorites();
+  
+  // Handle subscribe form
+  const subscribeForm = document.getElementById('subscribe-form');
+  if (subscribeForm) {
+    subscribeForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const emailInput = subscribeForm.querySelector('input[type="email"]');
+      const email = emailInput.value;
+      
+      if (email) {
+        console.log('Subscribe:', email);
+        // Add your subscription logic here
+        alert('Thank you for subscribing!');
+        subscribeForm.reset();
+      }
+    });
+  }
+  
+  // Mobile menu toggle
+  const menuToggle = document.querySelector('.menu-toggle');
+  const mobileMenu = document.querySelector('.mobile-menu');
+  const mobileMenuClose = document.querySelector('.mobile-menu-close');
+  
+  if (menuToggle && mobileMenu) {
+    menuToggle.addEventListener('click', () => {
+      mobileMenu.classList.add('active');
+    });
+  }
+  
+  if (mobileMenuClose && mobileMenu) {
+    mobileMenuClose.addEventListener('click', () => {
+      mobileMenu.classList.remove('active');
+    });
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', initFavoritesPage);
+
+// Export functions for use in other scripts
+if (typeof window !== 'undefined') {
+  window.favoritesManager = {
+    getFavorites,
+    saveFavorites,
+    addToFavorites,
+    removeFromFavorites,
+    isInFavorites,
+    renderFavorites
+  };
+}

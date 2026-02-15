@@ -1,6 +1,6 @@
 /* === FAVORITES LAYOUT === */
 .favorites-page {
-  padding-top: 100px; /* под хедер */
+  padding-top: 100px;
   margin-bottom: 80px;
 }
 
@@ -13,27 +13,39 @@
   margin-bottom: 40px;
 }
 
-/* Две колонки: левая — 400px, правая — остаток */
+/* Layout: Left column (495px) + Right column (rest) */
 .favorites-layout {
   display: grid;
-  grid-template-columns: 400px 1fr;
-  gap: 40px;
+  grid-template-columns: 495px 1fr;
+  gap: 32px;
+  align-items: start;
 }
 
-/* Левая колонка: две карточки — одна под другой */
+/* Left column: Quote + Norm cards stacked */
 .left-column {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 20px;
 }
 
-/* Карточка цитаты — чёрная */
+/* === QUOTE CARD === */
 .quote-card {
   background: #242424;
   color: #F4F4F4;
-  border-radius: var(--border-radius);
+  border-radius: 20px;
   padding: 40px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.quote-card::after {
+  content: '"';
+  position: absolute;
+  top: 32px;
+  right: 40px;
+  font-size: 100px;
+  font-family: Georgia, serif;
+  color: rgba(244, 244, 244, 0.1);
+  line-height: 1;
 }
 
 .quote-icon {
@@ -44,45 +56,48 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   color: #F4F4F4;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .quote-title {
-  font-weight: 500;
-  font-size: 24px;
-  margin-bottom: 16px;
+  font-weight: 400;
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: #F4F4F4;
 }
 
 .quote-text {
   font-weight: 400;
   font-size: 14px;
   line-height: 1.5;
-  opacity: 0.8;
-  margin-bottom: 16px;
+  color: rgba(244, 244, 244, 0.6);
+  margin-bottom: 20px;
 }
 
 .quote-author {
   font-weight: 400;
-  font-size: 16px;
+  font-size: 14px;
   text-align: right;
+  color: #F4F4F4;
 }
 
-/* Карточка нормы — белая, ниже цитаты */
+/* === NORM CARD === */
 .norm-card {
   background: #fff;
-  border-radius: var(--border-radius);
-  padding: 25px;
+  border-radius: 20px;
+  padding: 28px;
   display: flex;
   align-items: center;
-  gap: 20px;
-  box-shadow: var(--shadow-light);
+  gap: 28px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  position: relative;
 }
 
 .norm-icon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   background: #242424;
   border-radius: 50%;
   display: flex;
@@ -90,48 +105,193 @@
   justify-content: center;
   color: #F4F4F4;
   font-size: 12px;
+  flex-shrink: 0;
+}
+
+.norm-content {
+  flex: 1;
 }
 
 .norm-content h3 {
-  font-weight: 500;
+  font-weight: 700;
   font-size: 24px;
   margin-bottom: 4px;
   color: #242424;
+  line-height: 1;
 }
 
 .norm-content p {
   font-weight: 400;
   font-size: 14px;
-  color: rgba(36, 36, 36, 0.6);
+  color: rgba(36, 36, 36, 0.4);
+  line-height: 1.3;
 }
 
 .norm-image {
-  width: 141px;
-  height: 141px;
-  border-radius: var(--border-radius);
+  width: 146px;
+  height: 116px;
+  border-radius: 12px;
   background: url('../img/young-women-doing-fitness-outdoors-together.jpg') center/cover no-repeat;
+  flex-shrink: 0;
 }
 
-/* Правая колонка */
+/* === RIGHT COLUMN - EXERCISE CARDS === */
 .favorites-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 32px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  align-content: start;
 }
 
+/* Exercise Card */
+.exercise-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.exercise-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.workout-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: transparent;
+  border: 1px solid rgba(36, 36, 36, 0.2);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #242424;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: rgba(36, 36, 36, 0.4);
+  font-size: 18px;
+  transition: color 0.2s;
+}
+
+.delete-btn:hover {
+  color: #242424;
+}
+
+.exercise-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.exercise-icon {
+  width: 32px;
+  height: 32px;
+  background: #242424;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #F4F4F4;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.exercise-name {
+  font-size: 20px;
+  font-weight: 400;
+  color: #242424;
+  line-height: 1.2;
+}
+
+.exercise-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(36, 36, 36, 0.4);
+}
+
+.exercise-meta span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.exercise-meta strong {
+  color: #242424;
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.exercise-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+.start-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: transparent;
+  border: none;
+  color: #242424;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.start-btn:hover {
+  opacity: 0.7;
+}
+
+/* Empty State */
 .empty-state {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 80px 0;
+  padding: 120px 40px;
   color: #242424;
-  font-size: 18px;
+  font-size: 14px;
   line-height: 1.6;
+  max-width: 630px;
+  margin: 0 auto;
+  display: none;
 }
 
 /* === RESPONSIVE === */
+@media (max-width: 1200px) {
+  .favorites-layout {
+    grid-template-columns: 400px 1fr;
+  }
+}
+
 @media (max-width: 992px) {
   .favorites-layout {
     grid-template-columns: 1fr;
+  }
+
+  .favorites-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 32px;
   }
 
   .norm-card {
@@ -141,6 +301,29 @@
 
   .norm-image {
     width: 100%;
-    height: 120px;
+    height: 140px;
+  }
+
+  .favorites-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .favorites-page {
+    padding-top: 80px;
+  }
+
+  .page-title {
+    font-size: 28px;
+    margin-bottom: 24px;
+  }
+
+  .quote-card {
+    padding: 24px;
+  }
+
+  .norm-card {
+    padding: 20px;
   }
 }
