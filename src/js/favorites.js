@@ -132,16 +132,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!res.ok) throw new Error('Network error');
       const data = await res.json();
       if (data?.quote && data?.author) {
-        if (quoteText) quoteText.textContent = data.quote;
-        if (quoteAuthor) quoteAuthor.textContent = data.author;
+        quoteText.textContent = data.quote;
+        quoteAuthor.textContent = data.author;
       } else {
-        if (quoteText) quoteText.textContent = "Quote not available";
-        if (quoteAuthor) quoteAuthor.textContent = "";
+        quoteText.textContent = "Quote not available";
+        quoteAuthor.textContent = "";
       }
     } catch (err) {
       console.error('Error loading quote:', err);
-      if (quoteText) quoteText.textContent = "A lot of times I find that people who are blessed with the most talent don't ever develop that attitude, and the ones who aren't blessed in that way are the most competitive and have the biggest heart.";
-      if (quoteAuthor) quoteAuthor.textContent = "Tom Brady";
+      quoteText.textContent = "Failed to load quote";
     }
   }
 
