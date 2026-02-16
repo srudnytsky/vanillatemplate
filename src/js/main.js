@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedCategory = null;
   let currentFilterType = null;
   let searchQuery = '';
-  let currentExercise = null; // Добавлено для хранения текущего упражнения
+  let currentExercise = null;
 
   // === FAVORITES FUNCTIONS ===
   function getFavorites() {
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateRatingStars(rating) {
     const ratingStarsInput = document.querySelectorAll('.star-input');
-    ratingStarsInput.forEach((star, index) => {
+    ratingStarsInput.forEach((star) => {
       const starValue = parseFloat(star.getAttribute('data-rating'));
       if (starValue <= rating) {
         star.classList.add('active');
@@ -258,8 +258,6 @@ document.addEventListener('DOMContentLoaded', () => {
       card.className = 'exercise-card-horizontal';
 
       const rating = ex.rating || 0;
-      const fullStars = Math.floor(rating);
-      const halfStar = rating % 1 >= 0.5;
 
       card.innerHTML = `
         <div class="exercise-card-left">
@@ -298,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('exercise-modal');
     if (!modal) return;
 
-    currentExercise = exercise; // Сохраняем текущее упражнение
+    currentExercise = exercise;
 
     const modalImg = document.getElementById('modal-exercise-img');
     const modalName = document.getElementById('modal-exercise-name');
@@ -367,7 +365,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Close modal on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeExerciseModal();
@@ -421,7 +418,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const ratingModalClose = document.getElementById('rating-modal-close');
   const ratingForm = document.getElementById('rating-form');
 
-  // Star click handlers
   ratingStarsInput.forEach(star => {
     star.addEventListener('click', () => {
       const rating = parseFloat(star.getAttribute('data-rating'));
@@ -436,19 +432,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Reset stars on mouse leave
   if (ratingStarsContainer) {
     ratingStarsContainer.addEventListener('mouseleave', () => {
       updateRatingStars(selectedRating);
     });
   }
 
-  // Close rating modal
   if (ratingModalClose) {
     ratingModalClose.addEventListener('click', closeRatingModal);
   }
 
-  // Submit rating form
   if (ratingForm) {
     ratingForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -490,7 +483,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const data = await res.json();
         
-        // Save rating to localStorage
         const ratings = JSON.parse(localStorage.getItem('ratings') || '[]');
         ratings.push({
           exerciseId: currentExercise._id,
