@@ -1,4 +1,3 @@
-// favorites.js
 document.addEventListener('DOMContentLoaded', () => {
   // === MOBILE MENU ===
   const menuToggle = document.querySelector('.menu-toggle');
@@ -24,9 +23,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // === MAIN APP LOGIC ===
+  // === API AND STORAGE ===
   const API_BASE = 'https://your-energy.b.goit.study/api';
-
   const favoritesContent = document.getElementById('favorites-content');
   const quoteText = document.getElementById('fav-quote-text');
   const quoteAuthor = document.getElementById('fav-quote-author');
@@ -34,155 +32,130 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentExercise = null;
 
-  // === FAVORITES FUNCTIONS с диагностикой ===
+  // === FAVORITES MANAGEMENT ===
   function getFavorites() {
-    try {
-      // Пробуем получить из стандартного ключа
-      let favorites = localStorage.getItem('favorites');
-      
-      // Если нет, пробуем другие возможные ключи
-      if (!favorites) {
-        // Проверяем другие возможные ключи
-        const possibleKeys = ['favorites', 'fav', 'favouriteExercises', 'exerciseFavorites'];
-        for (let key of possibleKeys) {
-          const data = localStorage.getItem(key);
-          if (data) {
-            console.log('Найдены избранные в ключе:', key);
-            // Сохраняем в стандартный ключ для будущего использования
-            localStorage.setItem('favorites', data);
-            favorites = data;
-            break;
-          }
-        }
-      }
-      
-      // Пытаемся найти любые данные в localStorage, которые похожи на избранное
-      if (!favorites) {
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          const value = localStorage.getItem(key);
-          try {
-            const parsed = JSON.parse(value);
-            if (Array.isArray(parsed) && parsed.length > 0 && parsed[0]._id) {
-              console.log('Найден массив избранного в ключе:', key);
-              localStorage.setItem('favorites', value);
-              favorites = value;
-              break;
-            }
-          } catch (e) {
-            // Не JSON, пропускаем
-          }
-        }
-      }
-      
-      return favorites ? JSON.parse(favorites) : [];
-    } catch (error) {
-      console.error('Ошибка чтения избранного:', error);
-      return [];
-    }
+    const favorites = localStorage.getItem('favorites');
+    return favorites ? JSON.parse(favorites) : [];
   }
 
   function saveFavorites(favorites) {
-    try {
-      localStorage.setItem('favorites', JSON.stringify(favorites));
-      console.log('Сохранено в localStorage:', favorites.length, 'элементов');
-    } catch (error) {
-      console.error('Ошибка сохранения:', error);
-    }
+    localStorage.setItem('favorites', JSON.stringify(favorites));
   }
 
-  function removeFromFavorites(exerciseId) {
-    const favorites = getFavorites();
-    const updatedFavorites = favorites.filter(fav => fav._id !== exerciseId);
-    saveFavorites(updatedFavorites);
-    displayFavorites(); // Перерисовываем список
+  function removeFavorite(exerciseId) {
+    let favorites = getFavorites();
+    favorites = favorites.filter(fav => fav._id !== exerciseId);
+    saveFavorites(favorites);
+    displayFavorites();
   }
 
-  // === ОТОБРАЖЕНИЕ ИЗБРАННОГО ===
+  // === RENDER FAVORITES ===
   function displayFavorites() {
-    const favorites = getFavorites();
-    
-    console.log('Отображаем избранное:', favorites.length, 'элементов'); // Для отладки
-    
     if (!favoritesContent) return;
-    
+
+    const favorites = getFavorites();
+
     if (favorites.length === 0) {
+      // Show empty state
       favoritesContent.innerHTML = `
         <div class="no-favorites">
-          <p>You haven't added any exercises to favorites yet.</p>
-          <p>Go to the <a href="index.html" style="color: #EEA10C;">home page</a> to find exercises!</p>
+          <p>It appears that you haven't added any exercises to your favorites yet. To get started, you can add exercises that you like to your favorites for easier access in the future.</p>
         </div>
       `;
       return;
     }
 
+    // Render exercise cards
     favoritesContent.innerHTML = '';
     
-    favorites.forEach(ex => {
+    favorites.forEach(exercise => {
       const card = document.createElement('div');
       card.className = 'exercise-card-horizontal';
-
-      const rating = ex.rating || 0;
-
+      
+      const rating = exercise.rating || 0;
+      
       card.innerHTML = `
-        <div class="exercise-card-left">
-          <div class="workout-badge">
-            WORKOUT ${rating.toFixed(1)} ⭐
-          </div>
+        <div class="favorite-card-header">
+          <span class="workout-badge">WORKOUT</span>
+          <button class="delete-icon" data-id="${exercise._id}" aria-label="Remove from favorites">
+            🗑
+          </button>
+        </div>
+        
+        <div class="exercise-info-wrapper">
+          <div class="exercise-icon">⚡</div>
           <div class="exercise-info">
-            <h3>${ex.name || 'Unnamed exercise'}</h3>
-            <div class="exercise-details">
-              <span><span class="label">Burned calories:</span> ${ex.burnedCalories || 0} / ${ex.time || 0} min</span>
-              <span><span class="label">Body part:</span> ${ex.bodyPart || ''}</span>
-              <span><span class="label">Target:</span> ${ex.target || ''}</span>
-            </div>
+            <h3>${exercise.name}</h3>
           </div>
         </div>
-        <button class="remove-favorite-btn" data-id="${ex._id}">Remove</button>
+        
+        <div class="exercise-details">
+          <span><span class="label">Burned calories:</span> <span class="value">${exercise.burnedCalories || 0} / ${exercise.time || 0} min</span></span>
+          <span><span class="label">Body part:</span> <span class="value">${exercise.bodyPart || ''}</span></span>
+          <span><span class="label">Target:</span> <span class="value">${exercise.target || ''}</span></span>
+        </div>
+        
+        <div class="favorite-card-footer">
+          <button class="start-btn-fav" data-id="${exercise._id}">
+            Start
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M12.172 7L6.808 1.636L8.222 0.222L16 8L8.222 15.778L6.808 14.364L12.172 9H0V7H12.172Z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
       `;
-
-      // Кнопка удаления
-      const removeBtn = card.querySelector('.remove-favorite-btn');
-      removeBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        removeFromFavorites(ex._id);
-      });
-
-      // Открытие модального окна при клике на карточку
-      card.addEventListener('click', () => {
-        openExerciseModal(ex);
-      });
 
       favoritesContent.appendChild(card);
     });
+
+    // Add event listeners to delete buttons
+    document.querySelectorAll('.delete-icon').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const exerciseId = btn.getAttribute('data-id');
+        if (confirm('Remove this exercise from favorites?')) {
+          removeFavorite(exerciseId);
+        }
+      });
+    });
+
+    // Add event listeners to start buttons - opens modal
+    document.querySelectorAll('.start-btn-fav').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const exerciseId = btn.getAttribute('data-id');
+        const exercise = favorites.find(fav => fav._id === exerciseId);
+        if (exercise) {
+          openExerciseModal(exercise);
+        }
+      });
+    });
   }
 
-  // === Load daily quote ===
+  // === LOAD DAILY QUOTE ===
   async function loadQuote() {
     try {
       const res = await fetch(`${API_BASE}/quote`);
       if (!res.ok) throw new Error('Network error');
       const data = await res.json();
       if (data?.quote && data?.author) {
-        quoteText.textContent = data.quote;
-        quoteAuthor.textContent = data.author;
+        if (quoteText) quoteText.textContent = data.quote;
+        if (quoteAuthor) quoteAuthor.textContent = data.author;
       } else {
-        quoteText.textContent = "Quote not available";
-        quoteAuthor.textContent = "";
+        if (quoteText) quoteText.textContent = "Quote not available";
+        if (quoteAuthor) quoteAuthor.textContent = "";
       }
     } catch (err) {
       console.error('Error loading quote:', err);
-      quoteText.textContent = "Failed to load quote";
+      if (quoteText) quoteText.textContent = "A lot of times I find that people who are blessed with the most talent don't ever develop that attitude, and the ones who aren't blessed in that way are the most competitive and have the biggest heart.";
+      if (quoteAuthor) quoteAuthor.textContent = "Tom Brady";
     }
   }
 
-  // === Open Exercise Modal ===
+  // === OPEN EXERCISE MODAL ===
   function openExerciseModal(exercise) {
     const modal = document.getElementById('exercise-modal');
-    if (!modal) {
-      alert('Modal window not found');
-      return;
-    }
+    if (!modal) return;
 
     currentExercise = exercise;
 
@@ -221,26 +194,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (modalCalories) modalCalories.textContent = `${exercise.burnedCalories || 0}/${exercise.time || 0} min`;
     if (modalDescription) modalDescription.textContent = exercise.description || 'No description available.';
 
-    // Обновляем кнопку избранного
-    const addFavoritesBtn = document.getElementById('modal-add-favorites');
-    if (addFavoritesBtn) {
-      const isFav = getFavorites().some(fav => fav._id === exercise._id);
-      if (isFav) {
-        addFavoritesBtn.innerHTML = 'Remove from favorites ♥';
-        addFavoritesBtn.style.color = '#EEA10C';
-        addFavoritesBtn.style.borderColor = '#EEA10C';
-      } else {
-        addFavoritesBtn.innerHTML = 'Add to favorites ♡';
-        addFavoritesBtn.style.color = '#F4F4F4';
-        addFavoritesBtn.style.borderColor = 'rgba(244, 244, 244, 0.2)';
-      }
-    }
+    // Update favorites button state
+    updateFavoriteButton(exercise._id);
 
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
 
-  // === Close Exercise Modal ===
+  // === CLOSE EXERCISE MODAL ===
   function closeExerciseModal() {
     const modal = document.getElementById('exercise-modal');
     if (modal) {
@@ -249,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // === Modal event listeners ===
+  // === MODAL EVENT LISTENERS ===
   const modalCloseBtn = document.getElementById('modal-close');
   const modalOverlay = document.querySelector('.modal-overlay');
   
@@ -261,25 +222,41 @@ document.addEventListener('DOMContentLoaded', () => {
     modalOverlay.addEventListener('click', (e) => {
       if (e.target === modalOverlay) {
         closeExerciseModal();
+        closeRatingModal();
       }
     });
   }
 
-  // Close modal on Escape key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       closeExerciseModal();
+      closeRatingModal();
     }
   });
 
-  // === Favorites button functionality in modal ===
+  // === FAVORITES BUTTON FUNCTIONALITY ===
+  function updateFavoriteButton(exerciseId) {
+    const addFavoritesBtn = document.getElementById('modal-add-favorites');
+    if (!addFavoritesBtn) return;
+    
+    const favorites = getFavorites();
+    const isFavorite = favorites.some(fav => fav._id === exerciseId);
+    
+    if (isFavorite) {
+      addFavoritesBtn.innerHTML = 'Remove from favorites ♥';
+      addFavoritesBtn.style.color = '#EEA10C';
+      addFavoritesBtn.style.borderColor = '#EEA10C';
+    } else {
+      addFavoritesBtn.innerHTML = 'Add to favorites ♡';
+      addFavoritesBtn.style.color = '#F4F4F4';
+      addFavoritesBtn.style.borderColor = 'rgba(244, 244, 244, 0.2)';
+    }
+  }
+
   const addFavoritesBtn = document.getElementById('modal-add-favorites');
   if (addFavoritesBtn) {
     addFavoritesBtn.addEventListener('click', () => {
-      if (!currentExercise) {
-        alert('No exercise selected');
-        return;
-      }
+      if (!currentExercise) return;
 
       const favorites = getFavorites();
       const exerciseId = currentExercise._id;
@@ -288,24 +265,157 @@ document.addEventListener('DOMContentLoaded', () => {
       if (favoriteIndex > -1) {
         favorites.splice(favoriteIndex, 1);
         saveFavorites(favorites);
-        addFavoritesBtn.innerHTML = 'Add to favorites ♡';
-        addFavoritesBtn.style.color = '#F4F4F4';
-        addFavoritesBtn.style.borderColor = 'rgba(244, 244, 244, 0.2)';
+        updateFavoriteButton(exerciseId);
         alert('Removed from favorites!');
-        displayFavorites(); // Обновляем список избранного
+        displayFavorites();
       } else {
         favorites.push(currentExercise);
         saveFavorites(favorites);
-        addFavoritesBtn.innerHTML = 'Remove from favorites ♥';
-        addFavoritesBtn.style.color = '#EEA10C';
-        addFavoritesBtn.style.borderColor = '#EEA10C';
+        updateFavoriteButton(exerciseId);
         alert('Added to favorites!');
-        displayFavorites(); // Обновляем список избранного
+        displayFavorites();
       }
     });
   }
 
-  // === Subscription ===
+  // === RATING MODAL FUNCTIONALITY ===
+  const ratingModal = document.getElementById('rating-modal');
+  const ratingModalClose = document.getElementById('rating-modal-close');
+  const ratingForm = document.getElementById('rating-form');
+  const ratingStarsInput = document.querySelectorAll('.star-input');
+  const ratingCurrent = document.querySelector('.rating-current');
+  const giveRatingBtn = document.getElementById('modal-give-rating');
+  
+  let selectedRating = 0;
+
+  function openRatingModal() {
+    if (!ratingModal) return;
+    closeExerciseModal();
+    ratingModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    selectedRating = 0;
+    updateRatingStars(0);
+    if (ratingCurrent) ratingCurrent.textContent = '0.0';
+    if (ratingForm) ratingForm.reset();
+  }
+
+  function closeRatingModal() {
+    if (ratingModal) {
+      ratingModal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+  }
+
+  function updateRatingStars(rating) {
+    ratingStarsInput.forEach((star) => {
+      const starValue = parseFloat(star.getAttribute('data-rating'));
+      if (starValue <= rating) {
+        star.classList.add('active');
+        star.textContent = '⭐';
+      } else {
+        star.classList.remove('active');
+        star.textContent = '☆';
+      }
+    });
+  }
+
+  ratingStarsInput.forEach(star => {
+    star.addEventListener('click', () => {
+      const rating = parseFloat(star.getAttribute('data-rating'));
+      selectedRating = rating;
+      updateRatingStars(rating);
+      if (ratingCurrent) ratingCurrent.textContent = rating.toFixed(1);
+    });
+
+    star.addEventListener('mouseenter', () => {
+      const rating = parseFloat(star.getAttribute('data-rating'));
+      updateRatingStars(rating);
+    });
+  });
+
+  const ratingStarsContainer = document.querySelector('.rating-stars-input');
+  if (ratingStarsContainer) {
+    ratingStarsContainer.addEventListener('mouseleave', () => {
+      updateRatingStars(selectedRating);
+    });
+  }
+
+  if (giveRatingBtn) {
+    giveRatingBtn.addEventListener('click', () => {
+      if (!currentExercise) {
+        alert('No exercise selected');
+        return;
+      }
+      openRatingModal();
+    });
+  }
+
+  if (ratingModalClose) {
+    ratingModalClose.addEventListener('click', closeRatingModal);
+  }
+
+  if (ratingForm) {
+    ratingForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!currentExercise) {
+        alert('No exercise selected');
+        return;
+      }
+
+      if (selectedRating === 0) {
+        alert('Please select a rating');
+        return;
+      }
+
+      const email = document.getElementById('rating-email').value.trim();
+      const comment = document.getElementById('rating-comment').value.trim();
+
+      if (!email || !comment) {
+        alert('Please fill in all fields');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/exercises/${currentExercise._id}/rating`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            rate: selectedRating,
+            email: email,
+            review: comment
+          })
+        });
+
+        if (!res.ok) {
+          throw new Error('Failed to submit rating');
+        }
+
+        const data = await res.json();
+        
+        const ratings = JSON.parse(localStorage.getItem('ratings') || '[]');
+        ratings.push({
+          exerciseId: currentExercise._id,
+          exerciseName: currentExercise.name,
+          rating: selectedRating,
+          email: email,
+          comment: comment,
+          date: new Date().toISOString()
+        });
+        localStorage.setItem('ratings', JSON.stringify(ratings));
+
+        alert('Rating submitted successfully!');
+        closeRatingModal();
+      } catch (err) {
+        console.error('Error submitting rating:', err);
+        alert('Failed to submit rating. Please try again.');
+      }
+    });
+  }
+
+  // === SUBSCRIPTION ===
   if (subscribeForm) {
     subscribeForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -334,28 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // === Диагностика localStorage ===
-  function debugLocalStorage() {
-    console.log('=== localStorage diagnostic ===');
-    console.log('localStorage length:', localStorage.length);
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      const value = localStorage.getItem(key);
-      console.log(`Key: ${key}, Value length: ${value?.length}`);
-      try {
-        const parsed = JSON.parse(value);
-        if (Array.isArray(parsed)) {
-          console.log(`  → Это массив с ${parsed.length} элементами`);
-        }
-      } catch (e) {
-        // Не JSON
-      }
-    }
-    console.log('===============================');
-  }
-
-  // === Initialization ===
-  debugLocalStorage(); // Для отладки
+  // === INITIALIZATION ===
   loadQuote();
-  displayFavorites(); // Отображаем избранное при загрузке страницы
+  displayFavorites();
 });
